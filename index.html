@@ -38,6 +38,49 @@
             font-size: 1.2em;
         }
 
+        /* Toggle Switch */
+        .mode-toggle {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 0, 255, 0.1);
+            border-radius: 15px;
+            border: 2px solid #ff00ff;
+        }
+
+        .toggle-label {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: block;
+            color: #dda0dd;
+        }
+
+        .toggle-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .toggle-btn {
+            padding: 15px 30px;
+            border: 2px solid #ff00ff;
+            background: transparent;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: #ff00ff;
+            box-shadow: 0 0 20px #ff00ff;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255, 0, 255, 0.3);
+        }
+
         #categoryScreen { display: block; }
 
         .category-grid {
@@ -90,6 +133,14 @@
 
         .back-btn:hover { background: #ff66ff; }
 
+        .mode-indicator {
+            text-align: center;
+            color: #00ffff;
+            font-size: 1em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
         .progress-bar {
             height: 20px;
             background: #333;
@@ -123,6 +174,7 @@
             line-height: 1.5;
         }
 
+        /* Multiple Choice Options */
         .option {
             background: rgba(148, 0, 211, 0.3);
             border: 2px solid #9400d3;
@@ -158,6 +210,58 @@
             opacity: 0.7;
         }
 
+        /* Recitation Input */
+        .recitation-container {
+            margin-bottom: 20px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.2em;
+            border: 3px solid #ff00ff;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px #ff00ff;
+        }
+
+        .answer-input::placeholder {
+            color: #888;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            color: #003311;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            box-shadow: 0 0 30px #00ff88;
+            transform: scale(1.02);
+        }
+
+        .caps-warning {
+            text-align: center;
+            color: #ffaa00;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: none;
+        }
+
         .feedback {
             margin-top: 20px;
             padding: 25px;
@@ -188,6 +292,12 @@
             display: block;
         }
 
+        .correct-answer-display {
+            font-size: 0.8em;
+            margin-top: 10px;
+            color: #ffaaaa;
+        }
+
         .next-btn {
             width: 100%;
             padding: 18px;
@@ -202,7 +312,9 @@
             font-weight: bold;
         }
 
-        .next-btn:hover { box-shadow: 0 0 30px #ff00ff; }
+        .next-btn:hover {
+            box-shadow: 0 0 30px #ff00ff;
+        }
 
         #resultsScreen {
             display: none;
@@ -255,13 +367,22 @@
         
         <div id="categoryScreen">
             <h1>💕 Quiz for my bebe amawa 💕</h1>
-            <p class="subtitle">Just click click it bebe ko (HEHE IWUVYOU)!</p>
+            <p class="subtitle">BLEBLEBLEBLE BLEEEEHH!</p>
+            
+            <!-- Mode Toggle -->
+            <div class="mode-toggle">
+                <span class="toggle-label">Choose Quiz Mode:</span>
+                <div class="toggle-buttons">
+                    <button class="toggle-btn active" id="mcBtn" onclick="setMode('mc')">Multiple Choice</button>
+                    <button class="toggle-btn" id="reciteBtn" onclick="setMode('recite')">Recitation (Type Answer)</button>
+                </div>
+            </div>
             
             <div class="category-grid">
                 <div class="category-btn" onclick="startQuiz('asian')">
                     <div class="category-icon">🌏</div>
                     <div class="category-title">Asian Literature Overview</div>
-                    <div class="category-count">4 Questions</div>
+                    <div class="category-count">5 Questions</div>
                     <div class="random-badge">🔀 RANDOMIZED</div>
                 </div>
                 
@@ -303,7 +424,7 @@
                 <div class="category-btn" onclick="startQuiz('master')">
                     <div class="category-icon">👑</div>
                     <div class="category-title">MASTER QUIZ</div>
-                    <div class="category-count">43 Questions</div>
+                    <div class="category-count">44 Questions</div>
                     <div class="random-badge">🔀 FULLY RANDOMIZED</div>
                 </div>
             </div>
@@ -312,6 +433,8 @@
         <div id="quizScreen">
             <button class="back-btn" onclick="goBack()">← Quit Quiz</button>
             
+            <div class="mode-indicator" id="modeIndicator">Mode: Multiple Choice</div>
+            
             <div class="progress-bar">
                 <div class="progress-fill" id="progressBar"></div>
             </div>
@@ -319,7 +442,17 @@
             <div class="counter" id="counter">Question 1 / 10</div>
             <div class="question" id="questionText">Loading...</div>
             
-            <div id="optionsBox"></div>
+            <!-- Multiple Choice Container -->
+            <div id="mcContainer">
+                <div id="optionsBox"></div>
+            </div>
+            
+            <!-- Recitation Container -->
+            <div id="reciteContainer" class="recitation-container hidden">
+                <input type="text" class="answer-input" id="answerInput" placeholder="Type your answer here..." autocomplete="off">
+                <div class="caps-warning" id="capsWarning">⚠️ Caps Lock is ON (but it's okay, we check case-insensitive!)</div>
+                <button class="submit-btn" onclick="checkRecitation()">Submit Answer ✓</button>
+            </div>
             
             <div class="feedback" id="feedbackBox"></div>
             <button class="next-btn" id="nextButton" onclick="nextQuestion()">Next Question →</button>
@@ -336,32 +469,41 @@
 
     <script>
         // ============================================
-        // QUESTIONS DIRECTLY FROM HANDOUT - MATCHING STYLE
-        // Question = Description, Answer = Term
+        // QUESTIONS DIRECTLY FROM HANDOUT
         // ============================================
         
         const questionDatabase = {
-            // ASIAN LITERATURE OVERVIEW - Section III
+            // ASIAN LITERATURE OVERVIEW - Section III (NOW 5 QUESTIONS)
             asian: [
+                {
+                    q: "Refers to the collection of literary works—including poetry, prose, drama, epics, and folktales—produced by Asian writers across different historical periods and written in various Asian languages.",
+                    options: ["Asian Literature", "European Literature", "American Literature", "African Literature"],
+                    correct: 0,
+                    answer: "Asian Literature"
+                },
                 {
                     q: "Hinduism, Buddhism, Confucianism, Taoism, and other belief systems shape themes and moral lessons.",
                     options: ["Politics and Governance", "Religion", "History and Tradition", "Philosophy of Life"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Religion"
                 },
                 {
                     q: "Dynasties, empires, colonization, and social hierarchies influence perspectives.",
                     options: ["Religion", "Politics and Governance", "History and Tradition", "Philosophy of Life"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Politics and Governance"
                 },
                 {
                     q: "Myths, legends, and historical events are preserved through stories.",
                     options: ["Religion", "Politics and Governance", "History and Tradition", "Philosophy of Life"],
-                    correct: 2
+                    correct: 2,
+                    answer: "History and Tradition"
                 },
                 {
                     q: "Emphasis on harmony, balance, duty, respect, and collective identity.",
                     options: ["Religion", "Politics and Governance", "History and Tradition", "Philosophy of Life"],
-                    correct: 3
+                    correct: 3,
+                    answer: "Philosophy of Life"
                 }
             ],
             
@@ -370,32 +512,38 @@
                 {
                     q: "618–907 CE – Considered the golden age of Chinese poetry.",
                     options: ["Han Dynasty", "Tang Dynasty", "Song Dynasty", "Ming Dynasty"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Tang Dynasty"
                 },
                 {
                     q: "The most prestigious literary form in Chinese literature.",
                     options: ["Drama", "Poetry", "Novel", "Essay"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Poetry"
                 },
                 {
                     q: "Known for imaginative imagery, romantic expression, and Daoist influence.",
                     options: ["Tu Fu", "Li Po (Li Bai)", "Matsuo Basho", "Seo Jeong-ju"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Li Po"
                 },
                 {
                     q: "Known for realism and compassion; his works reflect war, poverty, and social responsibility.",
                     options: ["Li Po", "Tu Fu (Du Fu)", "Basho", "Tagore"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Tu Fu"
                 },
                 {
                     q: "Strong use of nature imagery and symbolism.",
                     options: ["Key characteristic of Chinese poetry", "Key characteristic of Japanese poetry", "Key characteristic of Korean poetry", "Key characteristic of Indian poetry"],
-                    correct: 0
+                    correct: 0,
+                    answer: "Key characteristic of Chinese poetry"
                 },
                 {
                     q: "Expression of personal emotions to comment on society and politics.",
                     options: ["Key characteristic of Chinese poetry", "Key characteristic of Japanese poetry", "Key characteristic of Korean poetry", "Key characteristic of Indian poetry"],
-                    correct: 0
+                    correct: 0,
+                    answer: "Key characteristic of Chinese poetry"
                 }
             ],
             
@@ -404,52 +552,62 @@
                 {
                     q: "A 17-syllable poem (5–7–5) often describing nature and fleeting moments.",
                     options: ["Noh", "Haiku", "Kabuki", "Sijo"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Haiku"
                 },
                 {
                     q: "A classical theatrical form combining music, dance, and drama.",
                     options: ["Haiku", "Noh", "Kabuki", "Hyangga"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Noh"
                 },
                 {
                     q: "A popular theater form with elaborate costumes and expressive acting.",
                     options: ["Noh", "Haiku", "Kabuki", "Kasa"],
-                    correct: 2
+                    correct: 2,
+                    answer: "Kabuki"
                 },
                 {
                     q: "The greatest master of haiku; blended travel, Zen philosophy, and nature imagery.",
                     options: ["Yosa Buson", "Kobayashi Issa", "Matsuo Basho", "Masaoka Shiki"],
-                    correct: 2
+                    correct: 2,
+                    answer: "Matsuo Basho"
                 },
                 {
                     q: "Appreciation of nature and impermanence.",
                     options: ["Mono no aware", "Dharma", "Filial piety", "Zen"],
-                    correct: 0
+                    correct: 0,
+                    answer: "Mono no aware"
                 },
                 {
                     q: "Primordial deities who created the Japanese islands.",
                     options: ["Amaterasu and Susano", "Izanagi and Izanami", "Tsukuyomi and Amaterasu", "Raijin and Fujin"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Izanagi and Izanami"
                 },
                 {
                     q: "Sun Goddess and most important Shinto deity.",
                     options: ["Moon Goddess", "Amaterasu", "War God", "Sea Goddess"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Amaterasu"
                 },
                 {
                     q: "Emphasis on emotions and inner experiences.",
                     options: ["Key feature of Chinese literature", "Key feature of Japanese literature", "Key feature of Korean literature", "Key feature of Indian literature"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Key feature of Japanese literature"
                 },
                 {
                     q: "Simple language with deep meaning.",
                     options: ["Key feature of Chinese literature", "Key feature of Japanese literature", "Key feature of Korean literature", "Key feature of Indian literature"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Key feature of Japanese literature"
                 },
                 {
                     q: "Early Japanese writing was influenced by this literature.",
                     options: ["Chinese literature", "Korean literature", "Indian literature", "European literature"],
-                    correct: 0
+                    correct: 0,
+                    answer: "Chinese literature"
                 }
             ],
             
@@ -458,37 +616,44 @@
                 {
                     q: "Invented in the 15th century, allowed literature to flourish among common people.",
                     options: ["Hanja", "Hangul", "Kanji", "Classical Chinese"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Hangul"
                 },
                 {
                     q: "Early Korean works were written in this.",
                     options: ["Hangul", "Classical Chinese", "Japanese", "English"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Classical Chinese"
                 },
                 {
                     q: "Native songs with themes of religion, loyalty, and reflection.",
                     options: ["Pyŏlgok", "Hyangga", "Sijo", "Kasa"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Hyangga"
                 },
                 {
                     q: "Poems focusing on love, longing, and emotional struggle.",
                     options: ["Hyangga", "Pyŏlgok (Changga)", "Sijo", "Kasa"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Pyŏlgok"
                 },
                 {
                     q: "Three-line poems emphasizing Confucian values and human emotions.",
                     options: ["Hyangga", "Pyŏlgok", "Sijo", "Kasa"],
-                    correct: 2
+                    correct: 2,
+                    answer: "Sijo"
                 },
                 {
                     q: "Long narrative poems about war, morality, and seclusion.",
                     options: ["Hyangga", "Pyŏlgok", "Sijo", "Kasa"],
-                    correct: 3
+                    correct: 3,
+                    answer: "Kasa"
                 },
                 {
                     q: "A major modern poet influenced by Buddhism and folklore.",
                     options: ["Li Po", "Matsuo Basho", "Seo Jeong-ju (Midang)", "Rabindranath Tagore"],
-                    correct: 2
+                    correct: 2,
+                    answer: "Seo Jeong-ju"
                 }
             ],
             
@@ -497,37 +662,44 @@
                 {
                     q: "Oldest sacred texts of Hinduism.",
                     options: ["Upanishads", "Brahmanas", "Vedas", "Puranas"],
-                    correct: 2
+                    correct: 2,
+                    answer: "Vedas"
                 },
                 {
                     q: "Ritual and sacrificial explanations.",
                     options: ["Vedas", "Brahmanas", "Upanishads", "Mahabharata"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Brahmanas"
                 },
                 {
                     q: "Philosophical writings on existence and self.",
                     options: ["Vedas", "Brahmanas", "Upanishads", "Ramayana"],
-                    correct: 2
+                    correct: 2,
+                    answer: "Upanishads"
                 },
                 {
                     q: "Explores duty (dharma), war, and morality.",
                     options: ["Ramayana", "Mahabharata", "Vedas", "Upanishads"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Mahabharata"
                 },
                 {
                     q: "Focuses on loyalty, honor, and ideal leadership.",
                     options: ["Mahabharata", "Ramayana", "Vedas", "Brahmanas"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Ramayana"
                 },
                 {
                     q: "First Asian Nobel Prize winner in Literature (1913).",
                     options: ["Haruki Murakami", "Rabindranath Tagore", "Lu Xun", "Kazuo Ishiguro"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Rabindranath Tagore"
                 },
                 {
                     q: "Indian literature is deeply connected to this.",
                     options: ["Only politics", "Religion, philosophy, and moral teachings", "Only technology", "Only Western culture"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Religion, philosophy, and moral teachings"
                 }
             ],
             
@@ -536,47 +708,56 @@
                 {
                     q: "Preserves cultural heritage and identity.",
                     options: ["Significance of Asian Literature", "Definition of Asian Literature", "Theme of Aged Mother", "None of the above"],
-                    correct: 0
+                    correct: 0,
+                    answer: "Significance of Asian Literature"
                 },
                 {
                     q: "Promotes intercultural understanding.",
                     options: ["Significance of Asian Literature", "Definition of Asian Literature", "Theme of Aged Mother", "None of the above"],
-                    correct: 0
+                    correct: 0,
+                    answer: "Significance of Asian Literature"
                 },
                 {
                     q: "Influences global literary movements.",
                     options: ["Significance of Asian Literature", "Definition of Asian Literature", "Theme of Aged Mother", "None of the above"],
-                    correct: 0
+                    correct: 0,
+                    answer: "Significance of Asian Literature"
                 },
                 {
                     q: "Presents universal themes such as love, struggle, faith, and humanity.",
                     options: ["Significance of Asian Literature", "Definition of Asian Literature", "Theme of Aged Mother", "None of the above"],
-                    correct: 0
+                    correct: 0,
+                    answer: "Significance of Asian Literature"
                 },
                 {
                     q: "Japanese Folktale that reflects values of filial piety, respect for elders, and wisdom.",
                     options: ["Tale of the Nine-Tailed", "The Story of an Aged Mother", "Naruto", "Mahabharata"],
-                    correct: 1
+                    correct: 1,
+                    answer: "The Story of an Aged Mother"
                 },
                 {
                     q: "What law did the ruler impose on the aged?",
                     options: ["All aged people must be abandoned", "All young men must join the army", "All women must work", "Extra taxes"],
-                    correct: 0
+                    correct: 0,
+                    answer: "All aged people must be abandoned"
                 },
                 {
                     q: "How did the son show love for his mother?",
                     options: ["He obeyed the law", "He secretly hid and protected his mother", "He left her", "He told everyone"],
-                    correct: 1
+                    correct: 1,
+                    answer: "He secretly hid and protected his mother"
                 },
                 {
                     q: "How did the aged mother show wisdom?",
                     options: ["By fighting", "By providing clever solutions to challenges", "By running away", "By staying silent"],
-                    correct: 1
+                    correct: 1,
+                    answer: "By providing clever solutions to challenges"
                 },
                 {
                     q: "What lesson about respecting elders does the story teach?",
                     options: ["Elders are useless", "Elders are valuable members whose wisdom should be respected", "Young people know best", "Rulers are always right"],
-                    correct: 1
+                    correct: 1,
+                    answer: "Elders are valuable members whose wisdom should be respected"
                 }
             ]
         };
@@ -585,6 +766,13 @@
         let currentIndex = 0;
         let score = 0;
         let answered = false;
+        let quizMode = 'mc'; // 'mc' or 'recite'
+
+        function setMode(mode) {
+            quizMode = mode;
+            document.getElementById('mcBtn').classList.toggle('active', mode === 'mc');
+            document.getElementById('reciteBtn').classList.toggle('active', mode === 'recite');
+        }
 
         function shuffleArray(array) {
             const newArray = [...array];
@@ -614,6 +802,19 @@
             document.getElementById('quizScreen').style.display = 'block';
             document.getElementById('resultsScreen').style.display = 'none';
             
+            // Set mode indicator
+            document.getElementById('modeIndicator').textContent = 
+                quizMode === 'mc' ? 'Mode: Multiple Choice' : 'Mode: Recitation (Type Answer)';
+            
+            // Show/hide appropriate containers
+            if (quizMode === 'mc') {
+                document.getElementById('mcContainer').classList.remove('hidden');
+                document.getElementById('reciteContainer').classList.add('hidden');
+            } else {
+                document.getElementById('mcContainer').classList.add('hidden');
+                document.getElementById('reciteContainer').classList.remove('hidden');
+            }
+            
             showQuestion();
         }
 
@@ -629,23 +830,49 @@
             const progress = ((currentIndex) / currentQuestions.length) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
             
-            const box = document.getElementById('optionsBox');
-            box.innerHTML = '';
-            
-            q.options.forEach((opt, idx) => {
-                const div = document.createElement('div');
-                div.className = 'option';
-                div.textContent = opt;
-                div.onclick = () => checkAnswer(idx);
-                box.appendChild(div);
-            });
-            
+            // Reset feedback and next button
             document.getElementById('feedbackBox').style.display = 'none';
             document.getElementById('feedbackBox').className = 'feedback';
             document.getElementById('nextButton').style.display = 'none';
+            
+            if (quizMode === 'mc') {
+                // Multiple choice setup
+                const box = document.getElementById('optionsBox');
+                box.innerHTML = '';
+                
+                q.options.forEach((opt, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'option';
+                    div.textContent = opt;
+                    div.onclick = () => checkMCAnswer(idx);
+                    box.appendChild(div);
+                });
+            } else {
+                // Recitation setup
+                const input = document.getElementById('answerInput');
+                input.value = '';
+                input.focus();
+                
+                // Allow Enter key to submit
+                input.onkeypress = function(e) {
+                    if (e.key === 'Enter') {
+                        checkRecitation();
+                    }
+                };
+                
+                // Check caps lock
+                input.onkeyup = function(e) {
+                    const warning = document.getElementById('capsWarning');
+                    if (e.getModifierState && e.getModifierState('CapsLock')) {
+                        warning.style.display = 'block';
+                    } else {
+                        warning.style.display = 'none';
+                    }
+                };
+            }
         }
 
-        function checkAnswer(selected) {
+        function checkMCAnswer(selected) {
             if (answered) return;
             answered = true;
             
@@ -667,6 +894,45 @@
                 feedback.className = 'feedback wrong';
             }
             
+            finishQuestion();
+        }
+
+        function checkRecitation() {
+            if (answered) return;
+            
+            const input = document.getElementById('answerInput');
+            const userAnswer = input.value.trim();
+            
+            if (userAnswer === '') {
+                alert('Please type an answer bebe! 💕');
+                return;
+            }
+            
+            answered = true;
+            
+            const q = currentQuestions[currentIndex];
+            const correctAnswer = q.answer;
+            const feedback = document.getElementById('feedbackBox');
+            
+            // Case-insensitive comparison
+            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+            
+            if (isCorrect) {
+                score++;
+                feedback.innerHTML = '✨💖 Good Job, Baby';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.innerHTML = `😢💔 Wrong Answer Baby :(<br><span class="correct-answer-display">Correct answer: ${correctAnswer}</span>`;
+                feedback.className = 'feedback wrong';
+            }
+            
+            // Disable input
+            input.disabled = true;
+            
+            finishQuestion();
+        }
+
+        function finishQuestion() {
             const progress = ((currentIndex + 1) / currentQuestions.length) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
             
@@ -680,6 +946,11 @@
         }
 
         function nextQuestion() {
+            // Re-enable input for recitation mode
+            if (quizMode === 'recite') {
+                document.getElementById('answerInput').disabled = false;
+            }
+            
             currentIndex++;
             if (currentIndex < currentQuestions.length) {
                 showQuestion();
@@ -721,6 +992,10 @@
             document.getElementById('categoryScreen').style.display = 'block';
             document.getElementById('quizScreen').style.display = 'none';
             document.getElementById('resultsScreen').style.display = 'none';
+            
+            // Reset input
+            document.getElementById('answerInput').disabled = false;
+            document.getElementById('answerInput').value = '';
         }
     </script>
 </body>
