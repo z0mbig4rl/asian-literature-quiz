@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Literature Quiz - Category Select</title>
+    <title>Asian Literature Master Quiz</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
@@ -34,7 +34,7 @@
         .subtitle {
             text-align: center;
             color: #dda0dd;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             font-size: 1.2em;
         }
 
@@ -45,7 +45,7 @@
 
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
         }
 
@@ -72,7 +72,7 @@
         }
 
         .category-title {
-            font-size: 1.3em;
+            font-size: 1.4em;
             font-weight: bold;
             margin-bottom: 5px;
         }
@@ -95,7 +95,7 @@
             background: #ff00ff;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: 10px;
             cursor: pointer;
             margin-bottom: 20px;
@@ -124,18 +124,19 @@
         .counter {
             text-align: center;
             color: #ff00ff;
-            font-size: 1.2em;
+            font-size: 1.3em;
             margin-bottom: 20px;
             font-weight: bold;
         }
 
         .question {
-            font-size: 1.4em;
+            font-size: 1.3em;
             margin-bottom: 25px;
             padding: 20px;
             background: rgba(255, 0, 255, 0.1);
             border-radius: 15px;
             border-left: 5px solid #ff00ff;
+            line-height: 1.5;
         }
 
         .option {
@@ -178,7 +179,7 @@
             padding: 25px;
             border-radius: 15px;
             text-align: center;
-            font-size: 1.5em;
+            font-size: 1.6em;
             font-weight: bold;
             display: none;
             animation: popIn 0.5s;
@@ -205,19 +206,20 @@
 
         .next-btn {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             margin-top: 20px;
             background: linear-gradient(90deg, #ff00ff, #9400d3);
             color: white;
             border: none;
             border-radius: 15px;
-            font-size: 1.2em;
+            font-size: 1.3em;
             cursor: pointer;
             display: none;
+            font-weight: bold;
         }
 
         .next-btn:hover {
-            box-shadow: 0 0 20px #ff00ff;
+            box-shadow: 0 0 30px #ff00ff;
         }
 
         /* RESULTS SCREEN */
@@ -225,6 +227,9 @@
             display: none;
             text-align: center;
             padding: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            border: 2px solid #ff00ff;
         }
 
         .big-score {
@@ -243,19 +248,22 @@
         }
 
         .restart-btn {
-            padding: 15px 40px;
+            padding: 18px 50px;
             background: #ff00ff;
             color: white;
             border: none;
             border-radius: 30px;
-            font-size: 1.2em;
+            font-size: 1.3em;
             cursor: pointer;
+            font-weight: bold;
         }
 
         .restart-btn:hover {
             background: #ff66ff;
-            box-shadow: 0 0 30px #ff00ff;
+            box-shadow: 0 0 40px #ff00ff;
         }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -263,56 +271,60 @@
         
         <!-- CATEGORY SELECTION -->
         <div id="categoryScreen">
-            <h1>📚 Literature Quiz</h1>
-            <p class="subtitle">Pick a category to start!</p>
+            <h1>📚 Asian Literature Quiz</h1>
+            <p class="subtitle">Choose your category - Questions are randomized every time!</p>
             
             <div class="category-grid">
                 <div class="category-btn" onclick="startQuiz('asian')">
                     <div class="category-icon">🌏</div>
-                    <div class="category-title">Asian Literature</div>
-                    <div class="category-desc">All traditions</div>
+                    <div class="category-title">Asian Literature Overview</div>
+                    <div class="category-desc">Definitions, influences & significance</div>
                 </div>
                 
                 <div class="category-btn" onclick="startQuiz('chinese')">
                     <div class="category-icon">🐉</div>
                     <div class="category-title">Chinese Literature</div>
-                    <div class="category-desc">Tang Dynasty & Poetry</div>
+                    <div class="category-desc">Tang Dynasty, Li Po, Tu Fu</div>
                 </div>
                 
                 <div class="category-btn" onclick="startQuiz('japanese')">
                     <div class="category-icon">🌸</div>
                     <div class="category-title">Japanese Literature</div>
-                    <div class="category-desc">Haiku & Mythology</div>
+                    <div class="category-desc">Haiku, Basho, Mythology, Aged Mother</div>
                 </div>
                 
                 <div class="category-btn" onclick="startQuiz('korean')">
                     <div class="category-icon">🎎</div>
                     <div class="category-title">Korean Literature</div>
-                    <div class="category-desc">Sijo & Hangul</div>
+                    <div class="category-desc">Hangul, Sijo, Hyangga, Seo Jeong-ju</div>
                 </div>
                 
                 <div class="category-btn" onclick="startQuiz('indian')">
                     <div class="category-icon">🕉️</div>
                     <div class="category-title">Indian Literature</div>
-                    <div class="category-desc">Vedas & Epics</div>
+                    <div class="category-desc">Vedas, Epics, Tagore, Dharma</div>
+                </div>
+                
+                <div class="category-btn" onclick="startQuiz('master')">
+                    <div class="category-icon">👑</div>
+                    <div class="category-title">MASTER QUIZ</div>
+                    <div class="category-desc">All categories combined - 50 questions!</div>
                 </div>
             </div>
         </div>
 
         <!-- QUIZ SCREEN -->
         <div id="quizScreen">
-            <button class="back-btn" onclick="goBack()">← Back to Categories</button>
+            <button class="back-btn" onclick="goBack()">← Quit Quiz</button>
             
             <div class="progress-bar">
                 <div class="progress-fill" id="progressBar"></div>
             </div>
             
-            <div class="counter" id="counter">Question 1 / 5</div>
-            <div class="question" id="questionText">Question goes here?</div>
+            <div class="counter" id="counter">Question 1 / 10</div>
+            <div class="question" id="questionText">Loading...</div>
             
-            <div id="optionsBox">
-                <!-- Options inserted by JS -->
-            </div>
+            <div id="optionsBox"></div>
             
             <div class="feedback" id="feedbackBox"></div>
             <button class="next-btn" id="nextButton" onclick="nextQuestion()">Next Question →</button>
@@ -321,91 +333,741 @@
         <!-- RESULTS SCREEN -->
         <div id="resultsScreen">
             <h1>🎉 Quiz Complete!</h1>
-            <div class="big-score" id="finalScore">0/5</div>
+            <div class="big-score" id="finalScore">0/10</div>
             <div class="result-msg" id="resultMessage">Great job!</div>
-            <button class="restart-btn" onclick="goBack()">Pick Another Quiz ↺</button>
+            <button class="restart-btn" onclick="goBack()">Choose New Quiz ↺</button>
         </div>
 
     </div>
 
     <script>
-        // QUESTION BANKS
-        const allQuestions = {
+        // ============================================
+        // COMPLETE QUESTION BANK - ALL FROM HANDOUT
+        // ============================================
+        
+        const questionDatabase = {
+            // ASIAN LITERATURE OVERVIEW (Section III, IX)
             asian: [
-                {q: "Which dynasty is the Golden Age of Chinese poetry?", options: ["Han", "Tang", "Ming", "Qing"], correct: 1},
-                {q: "What is the Haiku syllable structure?", options: ["3-5-3", "5-7-5", "7-5-7", "5-5-5"], correct: 1},
-                {q: "First Asian Nobel Literature winner?", options: ["Murakami", "Tagore", "Lu Xun", "Ishiguro"], correct: 1},
-                {q: "What does 'mono no aware' mean?", options: ["Warrior spirit", "Sword path", "Impermanence", "Honor"], correct: 2},
-                {q: "Which system revolutionized Korean writing?", options: ["Hanja", "Hangul", "Kanji", "Pinyin"], correct: 1}
+                {
+                    q: "What is Asian Literature?",
+                    options: [
+                        "Only modern novels from Asia",
+                        "Collection of poetry, prose, drama, epics, folktales from Asian writers",
+                        "Only religious texts from Asia",
+                        "European translations of Asian works"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Which of these is NOT a factor influencing Asian Literature?",
+                    options: [
+                        "Religion - Hinduism, Buddhism, Confucianism, Taoism",
+                        "Politics and Governance - Dynasties, empires, colonization",
+                        "History and Tradition - Myths, legends, historical events",
+                        "Technology and Space Exploration"
+                    ],
+                    correct: 3
+                },
+                {
+                    q: "Asian Literature works are produced in:",
+                    options: [
+                        "Only English language",
+                        "Various Asian languages across different historical periods",
+                        "Only ancient times",
+                        "Only modern times"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What does Asian Literature emphasize in Philosophy of Life?",
+                    options: [
+                        "Individual success and wealth",
+                        "Harmony, balance, duty, respect, and collective identity",
+                        "Competition and winning",
+                        "Isolation from society"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "How does Asian Literature preserve cultural heritage?",
+                    options: [
+                        "By forgetting old traditions",
+                        "Through myths, legends, and historical events preserved in stories",
+                        "By only writing about modern life",
+                        "By translating to English only"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What is the significance of Asian Literature in shaping global literary traditions?",
+                    options: [
+                        "It has no influence",
+                        "It influences global literary movements",
+                        "It only copies Western literature",
+                        "It is only for Asian readers"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Which religions shape themes and moral lessons in Asian Literature?",
+                    options: [
+                        "Only Christianity",
+                        "Hinduism, Buddhism, Confucianism, Taoism",
+                        "Only Islam",
+                        "Only Judaism"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What universal themes does Asian Literature present?",
+                    options: [
+                        "Only technology themes",
+                        "Love, struggle, faith, and humanity",
+                        "Only war themes",
+                        "Only economic themes"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "How does Asian Literature promote intercultural understanding?",
+                    options: [
+                        "By keeping cultures separate",
+                        "By sharing diverse cultural perspectives and values",
+                        "By only focusing on one culture",
+                        "By avoiding translation"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What does Asian Literature help preserve?",
+                    options: [
+                        "Only modern pop culture",
+                        "Cultural heritage and identity",
+                        "Only foreign cultures",
+                        "Only technology"
+                    ],
+                    correct: 1
+                }
             ],
+            
+            // CHINESE LITERATURE (Section IV)
             chinese: [
-                {q: "Tang Dynasty dates?", options: ["618-907 CE", "960-1279", "1368-1644", "206 BCE-220 CE"], correct: 0},
-                {q: "Li Po was influenced by?", options: ["Confucianism", "Legalism", "Daoism", "Buddhism"], correct: 2},
-                {q: "Tu Fu wrote about?", options: ["Love", "War & poverty", "Cooking", "Travel"], correct: 1},
-                {q: "Most prestigious Chinese form?", options: ["Poetry", "Novels", "Drama", "Essays"], correct: 0},
-                {q: "Li Po is also called?", options: ["Li Bai", "Li Shi", "Li Ming", "Li Qing"], correct: 0}
+                {
+                    q: "Which dynasty is considered the Golden Age of Chinese poetry?",
+                    options: [
+                        "Han Dynasty (206 BCE-220 CE)",
+                        "Tang Dynasty (618-907 CE)",
+                        "Song Dynasty (960-1279)",
+                        "Ming Dynasty (1368-1644)"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Chinese literature developed alongside which philosophical systems?",
+                    options: [
+                        "Only Confucianism",
+                        "Confucianism, Taoism, and Buddhism",
+                        "Only Christianity",
+                        "Only Islam"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What is the most prestigious literary form in Chinese literature?",
+                    options: [
+                        "Novels",
+                        "Poetry",
+                        "Drama",
+                        "Essays"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What is a key characteristic of Chinese poetry?",
+                    options: [
+                        "Strong use of nature imagery and symbolism",
+                        "Only urban settings",
+                        "No use of metaphors",
+                        "Only modern themes"
+                    ],
+                    correct: 0
+                },
+                {
+                    q: "What do Chinese literary works reflect?",
+                    options: [
+                        "Only entertainment",
+                        "Moral values, loyalty, and social responsibility",
+                        "Only foreign cultures",
+                        "Only science fiction"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Li Po (Li Bai) is known for:",
+                    options: [
+                        "Realism and war themes",
+                        "Imaginative imagery, romantic expression, and Daoist influence",
+                        "Political activism",
+                        "Historical records only"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Tu Fu (Du Fu) is known for:",
+                    options: [
+                        "Romantic love poetry",
+                        "Realism and compassion; works reflect war, poverty, and social responsibility",
+                        "Comedic plays",
+                        "Travel writing only"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "How does Chinese poetry express personal emotions?",
+                    options: [
+                        "Only in private diaries",
+                        "To comment on society and politics",
+                        "Never in poetry",
+                        "Only in letters"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Li Po was influenced by which philosophy?",
+                    options: [
+                        "Confucianism",
+                        "Daoism (Taoism)",
+                        "Legalism",
+                        "Mohism"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Tu Fu's works reflect:",
+                    options: [
+                        "Only nature beauty",
+                        "War, poverty, and social responsibility",
+                        "Only happy occasions",
+                        "Only royal court life"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Chinese literature is one of the:",
+                    options: [
+                        "Newest traditions",
+                        "Oldest and most influential literary traditions",
+                        "Least important traditions",
+                        "Shortest traditions"
+                    ],
+                    correct: 1
+                }
             ],
+            
+            // JAPANESE LITERATURE (Sections V, VI, X, XI)
             japanese: [
-                {q: "Haiku structure?", options: ["5-5-5", "5-7-5", "7-7", "3-5-3"], correct: 1},
-                {q: "Greatest Haiku master?", options: ["Buson", "Basho", "Issa", "Shiki"], correct: 1},
-                {q: "Mono no aware means?", options: ["Warrior", "Sword", "Impermanence", "Flower"], correct: 2},
-                {q: "Noh combines?", options: ["Music, dance, drama", "Only speech", "Food", "Sports"], correct: 0},
-                {q: "Izanagi and Izanami created?", options: ["Japan", "China", "Korea", "India"], correct: 0}
+                {
+                    q: "What is Japanese literature admired for?",
+                    options: [
+                        "Complex vocabulary only",
+                        "Emotional depth, subtlety, and aesthetic simplicity",
+                        "Long novels only",
+                        "Political speeches"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What does 'mono no aware' refer to?",
+                    options: [
+                        "Warrior spirit",
+                        "Appreciation of nature and impermanence",
+                        "Economic success",
+                        "Political power"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What is the syllable structure of a Haiku?",
+                    options: [
+                        "5-5-5",
+                        "5-7-5",
+                        "7-5-7",
+                        "3-5-3"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "How many syllables are in a Haiku?",
+                    options: [
+                        "10",
+                        "17",
+                        "21",
+                        "12"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What does Haiku often describe?",
+                    options: [
+                        "Nature and fleeting moments",
+                        "War and battles",
+                        "Political debates",
+                        "Economic theories"
+                    ],
+                    correct: 0
+                },
+                {
+                    q: "Noh is a classical theatrical form combining:",
+                    options: [
+                        "Only speech",
+                        "Music, dance, and drama",
+                        "Only painting",
+                        "Only sculpture"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What is Kabuki known for?",
+                    options: [
+                        "Simple costumes",
+                        "Elaborate costumes and expressive acting",
+                        "Silent performance",
+                        "Indoor only shows"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Matsuo Basho (1644-1694) is known as:",
+                    options: [
+                        "A samurai warrior",
+                        "The greatest master of haiku",
+                        "A politician",
+                        "A merchant"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What did Matsuo Basho blend in his haiku?",
+                    options: [
+                        "Only city life",
+                        "Travel, Zen philosophy, and nature imagery",
+                        "Only politics",
+                        "Only economics"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Who are Izanagi and Izanami?",
+                    options: [
+                        "Modern anime characters",
+                        "Primordial deities who created the Japanese islands",
+                        "Famous samurai",
+                        "Types of Japanese food"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Who is Amaterasu?",
+                    options: [
+                        "Moon Goddess",
+                        "Sun Goddess and most important Shinto deity",
+                        "War God",
+                        "Sea Goddess"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Which modern anime adapted Izanagi, Izanami, and Amaterasu?",
+                    options: [
+                        "Pokemon",
+                        "Naruto",
+                        "Dragon Ball",
+                        "One Piece"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What type of story is 'The Story of an Aged Mother'?",
+                    options: [
+                        "Chinese legend",
+                        "Japanese Folktale",
+                        "Korean drama",
+                        "Indian epic"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What values does 'The Story of an Aged Mother' reflect?",
+                    options: [
+                        "War and conquest",
+                        "Filial piety, respect for elders, and wisdom of age",
+                        "Economic wealth",
+                        "Political power"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What law did the ruler impose in 'The Story of an Aged Mother'?",
+                    options: [
+                        "All young men must join army",
+                        "All aged people must be abandoned",
+                        "All women must work in fields",
+                        "All families must pay extra taxes"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "How did the son show love for his mother in the story?",
+                    options: [
+                        "He obeyed the ruler's law",
+                        "He secretly hid and protected his mother",
+                        "He left her in the mountains",
+                        "He told everyone about her"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "How did the aged mother show wisdom?",
+                    options: [
+                        "By fighting the ruler",
+                        "By providing clever solutions to challenges",
+                        "By running away",
+                        "By staying silent"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What happened when the ruler realized the value of elders?",
+                    options: [
+                        "He made the law stricter",
+                        "He abolished the cruel law",
+                        "He punished the son",
+                        "He ignored them"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What is the moral of 'The Story of an Aged Mother'?",
+                    options: [
+                        "Elders are useless",
+                        "Elders are valuable members of society whose wisdom should be respected",
+                        "Young people know best",
+                        "Rulers are always right"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Early Japanese writing was influenced by:",
+                    options: [
+                        "Chinese literature",
+                        "Korean literature",
+                        "Indian literature",
+                        "European literature"
+                    ],
+                    correct: 0
+                }
             ],
+            
+            // KOREAN LITERATURE (Section VII)
             korean: [
-                {q: "Hangul invented when?", options: ["10th c.", "15th c.", "19th c.", "20th c."], correct: 1},
-                {q: "Before Hangul used?", options: ["Japanese", "Classical Chinese", "English", "Russian"], correct: 1},
-                {q: "Sijo is how many lines?", options: ["5", "3", "10", "1"], correct: 1},
-                {q: "Hyangga are?", options: ["Pop songs", "Native religious songs", "Translations", "Marches"], correct: 1},
-                {q: "Seo Jeong-ju influenced by?", options: ["Christianity", "Buddhism & folklore", "Greek myth", "Pop culture"], correct: 1}
+                {
+                    q: "What was Korean literature early works written in?",
+                    options: [
+                        "Hangul",
+                        "Classical Chinese",
+                        "Japanese",
+                        "English"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "When was Hangul invented?",
+                    options: [
+                        "10th century",
+                        "15th century",
+                        "19th century",
+                        "20th century"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What did Hangul allow?",
+                    options: [
+                        "Only royal family to write",
+                        "Literature to flourish among common people",
+                        "Only men to write",
+                        "Only religious texts"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What are Hyangga?",
+                    options: [
+                        "Modern pop songs",
+                        "Native songs with themes of religion, loyalty, and reflection",
+                        "Foreign translations",
+                        "Military marches"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What do Pyŏlgok (Changga) focus on?",
+                    options: [
+                        "War and politics only",
+                        "Love, longing, and emotional struggle",
+                        "Cooking recipes",
+                        "Sports"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "How many lines does a Sijo have?",
+                    options: [
+                        "One line",
+                        "Three lines",
+                        "Five lines",
+                        "Ten lines"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What values do Sijo emphasize?",
+                    options: [
+                        "Wealth and power",
+                        "Confucian values and human emotions",
+                        "War and conquest",
+                        "Isolation"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What are Kasa?",
+                    options: [
+                        "Short poems",
+                        "Long narrative poems about war, morality, and seclusion",
+                        "One-word answers",
+                        "Musical instruments"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Who is Seo Jeong-ju (Midang)?",
+                    options: [
+                        "A king",
+                        "A major modern poet influenced by Buddhism and folklore",
+                        "A general",
+                        "A merchant"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What does Korean literature reflect?",
+                    options: [
+                        "Only modern values",
+                        "Strong emotional expression, loyalty, and philosophical depth",
+                        "Only foreign influences",
+                        "Only comedy"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Modern Korean stories draw inspiration from:",
+                    options: [
+                        "Only American TV",
+                        "Ancient history and mythology",
+                        "Only European fairy tales",
+                        "Only scientific journals"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What is an example of modern Korean media inspired by ancient mythology?",
+                    options: [
+                        "Naruto",
+                        "Tale of the Nine-Tailed",
+                        "Dragon Ball",
+                        "Pokemon"
+                    ],
+                    correct: 1
+                }
             ],
+            
+            // INDIAN LITERATURE (Section VIII)
             indian: [
-                {q: "Oldest Hindu texts?", options: ["Upanishads", "Vedas", "Puranas", "Brahmanas"], correct: 1},
-                {q: "Upanishads focus on?", options: ["Cooking", "Existence & self", "War", "Building"], correct: 1},
-                {q: "Mahabharata explores?", options: ["Romance", "Dharma & war", "Comedy", "Sports"], correct: 1},
-                {q: "Tagore won Nobel in?", options: ["1901", "1913", "1920", "1930"], correct: 1},
-                {q: "Ramayana focuses on?", options: ["Loyalty & honor", "Cooking", "Math", "Science"], correct: 0}
+                {
+                    q: "What are the Vedas?",
+                    options: [
+                        "Modern novels",
+                        "Oldest sacred texts of Hinduism",
+                        "Islamic texts",
+                        "Buddhist prayers"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What do the Brahmanas explain?",
+                    options: [
+                        "Cooking techniques",
+                        "Ritual and sacrificial explanations",
+                        "War strategies",
+                        "Building construction"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What do the Upanishads focus on?",
+                    options: [
+                        "Fashion",
+                        "Philosophical writings on existence and self",
+                        "Sports",
+                        "Cooking"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What does the Mahabharata explore?",
+                    options: [
+                        "Only romance",
+                        "Duty (dharma), war, and morality",
+                        "Only comedy",
+                        "Only agriculture"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What does the Ramayana focus on?",
+                    options: [
+                        "Loyalty, honor, and ideal leadership",
+                        "Cooking recipes",
+                        "Mathematics",
+                        "Science experiments"
+                    ],
+                    correct: 0
+                },
+                {
+                    q: "Who was Rabindranath Tagore?",
+                    options: [
+                        "A scientist",
+                        "First Asian Nobel Prize winner in Literature (1913)",
+                        "A politician",
+                        "A general"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "When did Tagore win the Nobel Prize?",
+                    options: [
+                        "1901",
+                        "1913",
+                        "1920",
+                        "1930"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Indian literature is deeply connected to:",
+                    options: [
+                        "Only politics",
+                        "Religion, philosophy, and moral teachings",
+                        "Only technology",
+                        "Only Western culture"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What does 'dharma' mean in Indian literature?",
+                    options: [
+                        "Wealth",
+                        "Duty and righteousness",
+                        "Pleasure only",
+                        "Liberation only"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "Indian epics are written in:",
+                    options: [
+                        "Only English",
+                        "Sanskrit and regional languages",
+                        "Only Chinese",
+                        "Only Greek"
+                    ],
+                    correct: 1
+                },
+                {
+                    q: "What early foundation texts are mentioned in Indian literature?",
+                    options: [
+                        "Only Vedas",
+                        "Vedas, Brahmanas, and Upanishads",
+                        "Only modern texts",
+                        "Only foreign texts"
+                    ],
+                    correct: 1
+                }
             ]
         };
 
+        // ============================================
+        // QUIZ LOGIC
+        // ============================================
+        
         let currentQuestions = [];
-        let currentQIndex = 0;
+        let currentIndex = 0;
         let score = 0;
         let answered = false;
 
+        function shuffleArray(array) {
+            // Fisher-Yates shuffle algorithm
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         function startQuiz(category) {
-            console.log("Starting quiz:", category); // Debug
+            // Get questions based on category
+            if (category === 'master') {
+                // Combine ALL questions from all categories
+                let allQuestions = [];
+                Object.values(questionDatabase).forEach(qArray => {
+                    allQuestions = allQuestions.concat(qArray);
+                });
+                // Shuffle and take 50 (or all if less than 50)
+                currentQuestions = shuffleArray([...allQuestions]);
+                if (currentQuestions.length > 50) {
+                    currentQuestions = currentQuestions.slice(0, 50);
+                }
+            } else {
+                // Get specific category and shuffle
+                currentQuestions = shuffleArray([...questionDatabase[category]]);
+            }
             
-            // Hide category screen
-            document.getElementById('categoryScreen').style.display = 'none';
-            
-            // Show quiz screen
-            document.getElementById('quizScreen').style.display = 'block';
-            document.getElementById('resultsScreen').style.display = 'none';
-            
-            // Load questions
-            currentQuestions = allQuestions[category];
-            currentQIndex = 0;
+            currentIndex = 0;
             score = 0;
             answered = false;
+            
+            // Switch screens
+            document.getElementById('categoryScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            document.getElementById('resultsScreen').style.display = 'none';
             
             showQuestion();
         }
 
         function showQuestion() {
             answered = false;
-            const q = currentQuestions[currentQIndex];
+            const q = currentQuestions[currentIndex];
             
-            // Update counter
+            // Update UI
             document.getElementById('counter').textContent = 
-                `Question ${currentQIndex + 1} / ${currentQuestions.length}`;
+                `Question ${currentIndex + 1} / ${currentQuestions.length}`;
+            
+            document.getElementById('questionText').textContent = q.q;
             
             // Update progress bar
-            const progress = ((currentQIndex) / currentQuestions.length) * 100;
+            const progress = ((currentIndex) / currentQuestions.length) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
-            
-            // Show question
-            document.getElementById('questionText').textContent = q.q;
             
             // Create options
             const box = document.getElementById('optionsBox');
@@ -415,7 +1077,7 @@
                 const div = document.createElement('div');
                 div.className = 'option';
                 div.textContent = opt;
-                div.onclick = function() { checkAnswer(idx); };
+                div.onclick = () => checkAnswer(idx);
                 box.appendChild(div);
             });
             
@@ -429,14 +1091,14 @@
             if (answered) return;
             answered = true;
             
-            const q = currentQuestions[currentQIndex];
+            const q = currentQuestions[currentIndex];
             const options = document.querySelectorAll('.option');
             const feedback = document.getElementById('feedbackBox');
             
             // Disable all options
             options.forEach(opt => opt.classList.add('disabled'));
             
-            // Mark correct answer
+            // Show correct answer
             options[q.correct].classList.add('correct');
             
             if (selected === q.correct) {
@@ -451,16 +1113,23 @@
             }
             
             // Update progress
-            const progress = ((currentQIndex + 1) / currentQuestions.length) * 100;
+            const progress = ((currentIndex + 1) / currentQuestions.length) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
             
             // Show next button
             document.getElementById('nextButton').style.display = 'block';
+            
+            // Change button text on last question
+            if (currentIndex === currentQuestions.length - 1) {
+                document.getElementById('nextButton').textContent = 'See Results 🎉';
+            } else {
+                document.getElementById('nextButton').textContent = 'Next Question →';
+            }
         }
 
         function nextQuestion() {
-            currentQIndex++;
-            if (currentQIndex < currentQuestions.length) {
+            currentIndex++;
+            if (currentIndex < currentQuestions.length) {
                 showQuestion();
             } else {
                 showResults();
@@ -471,19 +1140,30 @@
             document.getElementById('quizScreen').style.display = 'none';
             document.getElementById('resultsScreen').style.display = 'block';
             
-            document.getElementById('finalScore').textContent = 
-                `${score}/${currentQuestions.length}`;
+            const total = currentQuestions.length;
+            document.getElementById('finalScore').textContent = `${score}/${total}`;
             
-            let msg = '';
-            const pct = (score / currentQuestions.length) * 100;
+            // Calculate percentage and message
+            const percentage = (score / total) * 100;
+            let message = '';
             
-            if (pct === 100) msg = 'PERFECT! You are a master! 👑';
-            else if (pct >= 80) msg = 'Amazing work! 🏆';
-            else if (pct >= 60) msg = 'Good job! Keep it up! 💪';
-            else if (pct >= 40) msg = 'Not bad! Study more! 📚';
-            else msg = 'Keep trying! You will improve! 💝';
+            if (percentage === 100) {
+                message = '🏆 PERFECT SCORE! You are an Asian Literature Master! 👑✨';
+            } else if (percentage >= 90) {
+                message = '🌟 Excellent! Amazing knowledge of Asian Literature!';
+            } else if (percentage >= 80) {
+                message = '🎉 Great job! You really studied well!';
+            } else if (percentage >= 70) {
+                message = '👍 Good work! Keep learning!';
+            } else if (percentage >= 60) {
+                message = '💪 Not bad! Review the handout and try again!';
+            } else if (percentage >= 50) {
+                message = '📚 Keep studying! You can do better!';
+            } else {
+                message = '💝 Don\'t give up! Read the handout again and retry!';
+            }
             
-            document.getElementById('resultMessage').textContent = msg;
+            document.getElementById('resultMessage').textContent = message;
         }
 
         function goBack() {
