@@ -38,7 +38,6 @@
             font-size: 1.2em;
         }
 
-        /* Toggle Switch */
         .mode-toggle {
             text-align: center;
             margin-bottom: 30px;
@@ -174,7 +173,6 @@
             line-height: 1.5;
         }
 
-        /* Multiple Choice Options */
         .option {
             background: rgba(148, 0, 211, 0.3);
             border: 2px solid #9400d3;
@@ -210,7 +208,6 @@
             opacity: 0.7;
         }
 
-        /* Recitation Input */
         .recitation-container {
             margin-bottom: 20px;
         }
@@ -236,6 +233,11 @@
             color: #888;
         }
 
+        .answer-input:disabled {
+            background: rgba(50, 50, 50, 0.5);
+            cursor: not-allowed;
+        }
+
         .submit-btn {
             width: 100%;
             padding: 18px;
@@ -252,6 +254,14 @@
         .submit-btn:hover {
             box-shadow: 0 0 30px #00ff88;
             transform: scale(1.02);
+        }
+
+        .submit-btn:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
 
         .caps-warning {
@@ -293,6 +303,26 @@
         }
 
         .correct-answer-display {
+            font-size: 0.7em;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: block;
+        }
+
+        .correct-answer-display .label {
+            color: #ffaaaa;
+            font-size: 0.9em;
+        }
+
+        .correct-answer-display .answer {
+            color: #00ffff;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        .your-answer {
             font-size: 0.8em;
             margin-top: 10px;
             color: #ffaaaa;
@@ -367,9 +397,8 @@
         
         <div id="categoryScreen">
             <h1>💕 Quiz for my bebe amawa 💕</h1>
-            <p class="subtitle">BLEBLEBLEBLE BLEEEEHH!</p>
+            <p class="subtitle">Match the description to the correct term!</p>
             
-            <!-- Mode Toggle -->
             <div class="mode-toggle">
                 <span class="toggle-label">Choose Quiz Mode:</span>
                 <div class="toggle-buttons">
@@ -442,16 +471,14 @@
             <div class="counter" id="counter">Question 1 / 10</div>
             <div class="question" id="questionText">Loading...</div>
             
-            <!-- Multiple Choice Container -->
             <div id="mcContainer">
                 <div id="optionsBox"></div>
             </div>
             
-            <!-- Recitation Container -->
             <div id="reciteContainer" class="recitation-container hidden">
                 <input type="text" class="answer-input" id="answerInput" placeholder="Type your answer here..." autocomplete="off">
                 <div class="caps-warning" id="capsWarning">⚠️ Caps Lock is ON (but it's okay, we check case-insensitive!)</div>
-                <button class="submit-btn" onclick="checkRecitation()">Submit Answer ✓</button>
+                <button class="submit-btn" id="submitBtn" onclick="checkRecitation()">Submit Answer ✓</button>
             </div>
             
             <div class="feedback" id="feedbackBox"></div>
@@ -468,12 +495,7 @@
     </div>
 
     <script>
-        // ============================================
-        // QUESTIONS DIRECTLY FROM HANDOUT
-        // ============================================
-        
         const questionDatabase = {
-            // ASIAN LITERATURE OVERVIEW - Section III (NOW 5 QUESTIONS)
             asian: [
                 {
                     q: "Refers to the collection of literary works—including poetry, prose, drama, epics, and folktales—produced by Asian writers across different historical periods and written in various Asian languages.",
@@ -507,7 +529,6 @@
                 }
             ],
             
-            // CHINESE LITERATURE - Section IV
             chinese: [
                 {
                     q: "618–907 CE – Considered the golden age of Chinese poetry.",
@@ -547,7 +568,6 @@
                 }
             ],
             
-            // JAPANESE LITERATURE - Sections V & VI
             japanese: [
                 {
                     q: "A 17-syllable poem (5–7–5) often describing nature and fleeting moments.",
@@ -611,7 +631,6 @@
                 }
             ],
             
-            // KOREAN LITERATURE - Section VII
             korean: [
                 {
                     q: "Invented in the 15th century, allowed literature to flourish among common people.",
@@ -657,7 +676,6 @@
                 }
             ],
             
-            // INDIAN LITERATURE - Section VIII
             indian: [
                 {
                     q: "Oldest sacred texts of Hinduism.",
@@ -703,7 +721,6 @@
                 }
             ],
             
-            // SIGNIFICANCE & AGED MOTHER - Sections IX, X, XI
             significance: [
                 {
                     q: "Preserves cultural heritage and identity.",
@@ -766,7 +783,7 @@
         let currentIndex = 0;
         let score = 0;
         let answered = false;
-        let quizMode = 'mc'; // 'mc' or 'recite'
+        let quizMode = 'mc';
 
         function setMode(mode) {
             quizMode = mode;
@@ -802,11 +819,9 @@
             document.getElementById('quizScreen').style.display = 'block';
             document.getElementById('resultsScreen').style.display = 'none';
             
-            // Set mode indicator
             document.getElementById('modeIndicator').textContent = 
                 quizMode === 'mc' ? 'Mode: Multiple Choice' : 'Mode: Recitation (Type Answer)';
             
-            // Show/hide appropriate containers
             if (quizMode === 'mc') {
                 document.getElementById('mcContainer').classList.remove('hidden');
                 document.getElementById('reciteContainer').classList.add('hidden');
@@ -830,13 +845,11 @@
             const progress = ((currentIndex) / currentQuestions.length) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
             
-            // Reset feedback and next button
             document.getElementById('feedbackBox').style.display = 'none';
             document.getElementById('feedbackBox').className = 'feedback';
             document.getElementById('nextButton').style.display = 'none';
             
             if (quizMode === 'mc') {
-                // Multiple choice setup
                 const box = document.getElementById('optionsBox');
                 box.innerHTML = '';
                 
@@ -848,19 +861,20 @@
                     box.appendChild(div);
                 });
             } else {
-                // Recitation setup
                 const input = document.getElementById('answerInput');
+                const submitBtn = document.getElementById('submitBtn');
+                
                 input.value = '';
+                input.disabled = false;
+                submitBtn.disabled = false;
                 input.focus();
                 
-                // Allow Enter key to submit
                 input.onkeypress = function(e) {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !answered) {
                         checkRecitation();
                     }
                 };
                 
-                // Check caps lock
                 input.onkeyup = function(e) {
                     const warning = document.getElementById('capsWarning');
                     if (e.getModifierState && e.getModifierState('CapsLock')) {
@@ -886,11 +900,23 @@
             if (selected === q.correct) {
                 score++;
                 options[selected].classList.add('correct');
-                feedback.innerHTML = '✨💖 Good Job, Baby';
+                feedback.innerHTML = `
+                    ✨💖 Good Job, Baby
+                    <div class="correct-answer-display">
+                        <div class="label">Correct Answer:</div>
+                        <div class="answer">${q.answer}</div>
+                    </div>
+                `;
                 feedback.className = 'feedback correct';
             } else {
                 options[selected].classList.add('wrong');
-                feedback.innerHTML = '😢💔 Wrong Answer Baby :(';
+                feedback.innerHTML = `
+                    😢💔 Wrong Answer Baby :(
+                    <div class="correct-answer-display">
+                        <div class="label">Correct Answer:</div>
+                        <div class="answer">${q.answer}</div>
+                    </div>
+                `;
                 feedback.className = 'feedback wrong';
             }
             
@@ -901,6 +927,7 @@
             if (answered) return;
             
             const input = document.getElementById('answerInput');
+            const submitBtn = document.getElementById('submitBtn');
             const userAnswer = input.value.trim();
             
             if (userAnswer === '') {
@@ -914,20 +941,32 @@
             const correctAnswer = q.answer;
             const feedback = document.getElementById('feedbackBox');
             
-            // Case-insensitive comparison
             const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+            
+            input.disabled = true;
+            submitBtn.disabled = true;
             
             if (isCorrect) {
                 score++;
-                feedback.innerHTML = '✨💖 Good Job, Baby';
+                feedback.innerHTML = `
+                    ✨💖 Good Job, Baby
+                    <div class="correct-answer-display">
+                        <div class="label">Correct Answer:</div>
+                        <div class="answer">${correctAnswer}</div>
+                    </div>
+                `;
                 feedback.className = 'feedback correct';
             } else {
-                feedback.innerHTML = `😢💔 Wrong Answer Baby :(<br><span class="correct-answer-display">Correct answer: ${correctAnswer}</span>`;
+                feedback.innerHTML = `
+                    😢💔 Wrong Answer Baby :(
+                    <div class="your-answer">Your answer: "${userAnswer}"</div>
+                    <div class="correct-answer-display">
+                        <div class="label">Correct Answer:</div>
+                        <div class="answer">${correctAnswer}</div>
+                    </div>
+                `;
                 feedback.className = 'feedback wrong';
             }
-            
-            // Disable input
-            input.disabled = true;
             
             finishQuestion();
         }
@@ -946,9 +985,10 @@
         }
 
         function nextQuestion() {
-            // Re-enable input for recitation mode
             if (quizMode === 'recite') {
                 document.getElementById('answerInput').disabled = false;
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('answerInput').value = '';
             }
             
             currentIndex++;
@@ -976,7 +1016,7 @@
             } else if (percentage >= 80) {
                 message = '🎉 LAPIT NAA BEBE! LAPIT NA MAPERFECT! 💝';
             } else if (percentage >= 70) {
-                message = '💪 LAPIT NAA BABYY! GO SEXY GO SEXY! 💕';
+                message = '💪 LAPIT NAA BABYY! GO SEXY GO SEXY!  💕';
             } else if (percentage >= 60) {
                 message = '📚 GAWINGG MANN BEBEE! LAPIT NAA! 💗';
             } else if (percentage >= 50) {
@@ -993,8 +1033,8 @@
             document.getElementById('quizScreen').style.display = 'none';
             document.getElementById('resultsScreen').style.display = 'none';
             
-            // Reset input
             document.getElementById('answerInput').disabled = false;
+            document.getElementById('submitBtn').disabled = false;
             document.getElementById('answerInput').value = '';
         }
     </script>
