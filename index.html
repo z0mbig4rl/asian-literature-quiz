@@ -236,6 +236,7 @@
         .answer-input:disabled {
             background: rgba(50, 50, 50, 0.5);
             cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .submit-btn {
@@ -272,6 +273,89 @@
             display: none;
         }
 
+        /* ANSWER DISPLAY BOX - Shows after submitting */
+        .answer-display-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .answer-display-box.show {
+            display: block;
+        }
+
+        .answer-display-box.correct-answer {
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid #00ff88;
+        }
+
+        .answer-display-box.wrong-answer {
+            background: rgba(255, 51, 102, 0.15);
+            border: 2px solid #ff3366;
+        }
+
+        .result-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .correct-answer .result-title {
+            color: #00ff88;
+        }
+
+        .wrong-answer .result-title {
+            color: #ff3366;
+        }
+
+        .your-answer-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .your-answer-label {
+            font-size: 0.9em;
+            color: #ffaaaa;
+            margin-bottom: 5px;
+        }
+
+        .your-answer-text {
+            font-size: 1.2em;
+            color: white;
+            word-break: break-word;
+        }
+
+        .correct-answer-box {
+            background: rgba(0, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #00ffff;
+        }
+
+        .correct-answer-label {
+            font-size: 0.9em;
+            color: #00ffff;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .correct-answer-text {
+            font-size: 1.4em;
+            color: #00ffff;
+            font-weight: bold;
+            word-break: break-word;
+        }
+
         .feedback {
             margin-top: 20px;
             padding: 25px;
@@ -300,32 +384,6 @@
             border: 3px solid #ff3366;
             color: #ff3366;
             display: block;
-        }
-
-        .correct-answer-display {
-            font-size: 0.7em;
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            display: block;
-        }
-
-        .correct-answer-display .label {
-            color: #ffaaaa;
-            font-size: 0.9em;
-        }
-
-        .correct-answer-display .answer {
-            color: #00ffff;
-            font-size: 1.1em;
-            margin-top: 5px;
-        }
-
-        .your-answer {
-            font-size: 0.8em;
-            margin-top: 10px;
-            color: #ffaaaa;
         }
 
         .next-btn {
@@ -471,14 +529,29 @@
             <div class="counter" id="counter">Question 1 / 10</div>
             <div class="question" id="questionText">Loading...</div>
             
+            <!-- Multiple Choice Container -->
             <div id="mcContainer">
                 <div id="optionsBox"></div>
             </div>
             
+            <!-- Recitation Container -->
             <div id="reciteContainer" class="recitation-container hidden">
                 <input type="text" class="answer-input" id="answerInput" placeholder="Type your answer here..." autocomplete="off">
                 <div class="caps-warning" id="capsWarning">⚠️ Caps Lock is ON (but it's okay, we check case-insensitive!)</div>
                 <button class="submit-btn" id="submitBtn" onclick="checkRecitation()">Submit Answer ✓</button>
+                
+                <!-- ANSWER DISPLAY BOX - Shows after submitting -->
+                <div id="answerDisplayBox" class="answer-display-box">
+                    <div class="result-title" id="resultTitle"></div>
+                    <div class="your-answer-box" id="yourAnswerBox">
+                        <div class="your-answer-label">Your Answer:</div>
+                        <div class="your-answer-text" id="yourAnswerText"></div>
+                    </div>
+                    <div class="correct-answer-box">
+                        <div class="correct-answer-label">✓ CORRECT ANSWER:</div>
+                        <div class="correct-answer-text" id="correctAnswerText"></div>
+                    </div>
+                </div>
             </div>
             
             <div class="feedback" id="feedbackBox"></div>
@@ -845,9 +918,15 @@
             const progress = ((currentIndex) / currentQuestions.length) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
             
+            // Reset all displays
             document.getElementById('feedbackBox').style.display = 'none';
             document.getElementById('feedbackBox').className = 'feedback';
             document.getElementById('nextButton').style.display = 'none';
+            
+            // Hide answer display box
+            const answerBox = document.getElementById('answerDisplayBox');
+            answerBox.classList.remove('show', 'correct-answer', 'wrong-answer');
+            answerBox.style.display = 'none';
             
             if (quizMode === 'mc') {
                 const box = document.getElementById('optionsBox');
@@ -900,26 +979,15 @@
             if (selected === q.correct) {
                 score++;
                 options[selected].classList.add('correct');
-                feedback.innerHTML = `
-                    ✨💖 Good Job, Baby
-                    <div class="correct-answer-display">
-                        <div class="label">Correct Answer:</div>
-                        <div class="answer">${q.answer}</div>
-                    </div>
-                `;
+                feedback.innerHTML = '✨💖 Good Job, Baby';
                 feedback.className = 'feedback correct';
             } else {
                 options[selected].classList.add('wrong');
-                feedback.innerHTML = `
-                    😢💔 Wrong Answer Baby :(
-                    <div class="correct-answer-display">
-                        <div class="label">Correct Answer:</div>
-                        <div class="answer">${q.answer}</div>
-                    </div>
-                `;
+                feedback.innerHTML = '😢💔 Wrong Answer Baby :(';
                 feedback.className = 'feedback wrong';
             }
             
+            feedback.style.display = 'block';
             finishQuestion();
         }
 
@@ -939,34 +1007,34 @@
             
             const q = currentQuestions[currentIndex];
             const correctAnswer = q.answer;
-            const feedback = document.getElementById('feedbackBox');
-            
             const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
             
+            // Disable input and button
             input.disabled = true;
             submitBtn.disabled = true;
             
+            // Show answer display box
+            const answerBox = document.getElementById('answerDisplayBox');
+            const resultTitle = document.getElementById('resultTitle');
+            const yourAnswerText = document.getElementById('yourAnswerText');
+            const correctAnswerText = document.getElementById('correctAnswerText');
+            
+            yourAnswerText.textContent = userAnswer || '(empty)';
+            correctAnswerText.textContent = correctAnswer;
+            
             if (isCorrect) {
                 score++;
-                feedback.innerHTML = `
-                    ✨💖 Good Job, Baby
-                    <div class="correct-answer-display">
-                        <div class="label">Correct Answer:</div>
-                        <div class="answer">${correctAnswer}</div>
-                    </div>
-                `;
-                feedback.className = 'feedback correct';
+                answerBox.classList.add('correct-answer');
+                answerBox.classList.remove('wrong-answer');
+                resultTitle.innerHTML = '✨💖 Good Job, Baby';
             } else {
-                feedback.innerHTML = `
-                    😢💔 Wrong Answer Baby :(
-                    <div class="your-answer">Your answer: "${userAnswer}"</div>
-                    <div class="correct-answer-display">
-                        <div class="label">Correct Answer:</div>
-                        <div class="answer">${correctAnswer}</div>
-                    </div>
-                `;
-                feedback.className = 'feedback wrong';
+                answerBox.classList.add('wrong-answer');
+                answerBox.classList.remove('correct-answer');
+                resultTitle.innerHTML = '😢💔 Wrong Answer Baby :(';
             }
+            
+            answerBox.style.display = 'block';
+            answerBox.classList.add('show');
             
             finishQuestion();
         }
@@ -989,6 +1057,11 @@
                 document.getElementById('answerInput').disabled = false;
                 document.getElementById('submitBtn').disabled = false;
                 document.getElementById('answerInput').value = '';
+                
+                // Hide answer box
+                const answerBox = document.getElementById('answerDisplayBox');
+                answerBox.classList.remove('show', 'correct-answer', 'wrong-answer');
+                answerBox.style.display = 'none';
             }
             
             currentIndex++;
@@ -1016,11 +1089,11 @@
             } else if (percentage >= 80) {
                 message = '🎉 LAPIT NAA BEBE! LAPIT NA MAPERFECT! 💝';
             } else if (percentage >= 70) {
-                message = '💪 LAPIT NAA BABYY! GO SEXY GO SEXY!  💕';
+                message = '💪 LAPIT NAA BABYY! GO SEXY GO SEXY! 💕';
             } else if (percentage >= 60) {
                 message = '📚 GAWINGG MANN BEBEE! LAPIT NAA! 💗';
             } else if (percentage >= 50) {
-                message = '💝 GAWING MAN BABYYY! 💖';
+                message = '💝 GAWING MAN BABYYY!  💖';
             } else {
                 message = '💪 READD HANDOUTTT BABEEEE! 💕';
             }
@@ -1036,6 +1109,11 @@
             document.getElementById('answerInput').disabled = false;
             document.getElementById('submitBtn').disabled = false;
             document.getElementById('answerInput').value = '';
+            
+            // Hide answer box
+            const answerBox = document.getElementById('answerDisplayBox');
+            answerBox.classList.remove('show', 'correct-answer', 'wrong-answer');
+            answerBox.style.display = 'none';
         }
     </script>
 </body>
