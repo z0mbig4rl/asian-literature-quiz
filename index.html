@@ -1,1119 +1,727 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-900 text-slate-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz for my bebe amawa</title>
+    <title>Spot the Duck</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a0033 0%, #330066 50%, #4a0080 100%);
-            min-height: 100vh;
-            color: white;
-            padding: 20px;
+        .game-canvas-container {
+            cursor: grab;
+        }
+        .game-canvas-container:active {
+            cursor: grabbing;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
+        /* Radar hint pulse animation */
+        @keyframes radar-pulse {
+            0% {
+                transform: scale(0.3);
+                opacity: 0.9;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+        .radar-effect {
+            animation: radar-pulse 1.8s infinite ease-out;
         }
 
-        h1 {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px #ff00ff;
+        /* Found duck pop animation */
+        @keyframes duck-pop {
+            0% { transform: scale(0.2) rotate(-15deg); opacity: 0; }
+            50% { transform: scale(1.3) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
-
-        .subtitle {
-            text-align: center;
-            color: #dda0dd;
-            margin-bottom: 30px;
-            font-size: 1.2em;
+        .duck-found-anim {
+            animation: duck-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-
-        .mode-toggle {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255, 0, 255, 0.1);
-            border-radius: 15px;
-            border: 2px solid #ff00ff;
-        }
-
-        .toggle-label {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            display: block;
-            color: #dda0dd;
-        }
-
-        .toggle-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .toggle-btn {
-            padding: 15px 30px;
-            border: 2px solid #ff00ff;
-            background: transparent;
-            color: white;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: all 0.3s;
-        }
-
-        .toggle-btn.active {
-            background: #ff00ff;
-            box-shadow: 0 0 20px #ff00ff;
-        }
-
-        .toggle-btn:hover {
-            background: rgba(255, 0, 255, 0.3);
-        }
-
-        #categoryScreen { display: block; }
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .category-btn {
-            background: linear-gradient(135deg, #9400d3, #4b0082);
-            border: 3px solid #ff00ff;
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
-        }
-
-        .category-btn:hover {
-            transform: translateY(-10px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(255, 0, 255, 0.6);
-            border-color: #fff;
-        }
-
-        .category-icon { font-size: 3em; margin-bottom: 10px; }
-        .category-title { font-size: 1.4em; font-weight: bold; margin-bottom: 5px; }
-        .category-count { font-size: 1.1em; color: #00ffff; margin-top: 10px; font-weight: bold; }
-        .category-desc { font-size: 0.9em; color: #dda0dd; }
-        .random-badge { background: #00ffff; color: #000; padding: 5px 15px; border-radius: 20px; font-size: 0.8em; font-weight: bold; margin-top: 10px; display: inline-block; }
-
-        #quizScreen {
-            display: none;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 30px;
-            border-radius: 20px;
-            border: 2px solid #ff00ff;
-        }
-
-        .back-btn {
-            background: #ff00ff;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            font-size: 1em;
-        }
-
-        .back-btn:hover { background: #ff66ff; }
-
-        .mode-indicator {
-            text-align: center;
-            color: #00ffff;
-            font-size: 1em;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .progress-bar {
-            height: 20px;
-            background: #333;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff00ff, #00ffff);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .counter {
-            text-align: center;
-            color: #ff00ff;
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .question {
-            font-size: 1.3em;
-            margin-bottom: 25px;
-            padding: 20px;
-            background: rgba(255, 0, 255, 0.1);
-            border-radius: 15px;
-            border-left: 5px solid #ff00ff;
-            line-height: 1.5;
-        }
-
-        .option {
-            background: rgba(148, 0, 211, 0.3);
-            border: 2px solid #9400d3;
-            border-radius: 15px;
-            padding: 18px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.1em;
-        }
-
-        .option:hover {
-            background: rgba(255, 0, 255, 0.3);
-            border-color: #ff00ff;
-            transform: translateX(10px);
-        }
-
-        .option.correct {
-            background: #00ff88;
-            border-color: #00ff88;
-            color: #003311;
-            font-weight: bold;
-        }
-
-        .option.wrong {
-            background: #ff3366;
-            border-color: #ff3366;
-            color: white;
-        }
-
-        .option.disabled {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .recitation-container {
-            margin-bottom: 20px;
-        }
-
-        .answer-input {
-            width: 100%;
-            padding: 20px;
-            font-size: 1.2em;
-            border: 3px solid #ff00ff;
-            border-radius: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .answer-input:focus {
-            outline: none;
-            box-shadow: 0 0 20px #ff00ff;
-        }
-
-        .answer-input::placeholder {
-            color: #888;
-        }
-
-        .answer-input:disabled {
-            background: rgba(50, 50, 50, 0.5);
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(90deg, #00ff88, #00cc6a);
-            color: #003311;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.3em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .submit-btn:hover {
-            box-shadow: 0 0 30px #00ff88;
-            transform: scale(1.02);
-        }
-
-        .submit-btn:disabled {
-            background: #555;
-            color: #888;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        .caps-warning {
-            text-align: center;
-            color: #ffaa00;
-            font-size: 0.9em;
-            margin-top: 10px;
-            display: none;
-        }
-
-        /* ANSWER DISPLAY BOX - Shows after submitting */
-        .answer-display-box {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            display: none;
-            animation: slideDown 0.5s ease;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .answer-display-box.show {
-            display: block;
-        }
-
-        .answer-display-box.correct-answer {
-            background: rgba(0, 255, 136, 0.15);
-            border: 2px solid #00ff88;
-        }
-
-        .answer-display-box.wrong-answer {
-            background: rgba(255, 51, 102, 0.15);
-            border: 2px solid #ff3366;
-        }
-
-        .result-title {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .correct-answer .result-title {
-            color: #00ff88;
-        }
-
-        .wrong-answer .result-title {
-            color: #ff3366;
-        }
-
-        .your-answer-box {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
-
-        .your-answer-label {
-            font-size: 0.9em;
-            color: #ffaaaa;
-            margin-bottom: 5px;
-        }
-
-        .your-answer-text {
-            font-size: 1.2em;
-            color: white;
-            word-break: break-word;
-        }
-
-        .correct-answer-box {
-            background: rgba(0, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px solid #00ffff;
-        }
-
-        .correct-answer-label {
-            font-size: 0.9em;
-            color: #00ffff;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .correct-answer-text {
-            font-size: 1.4em;
-            color: #00ffff;
-            font-weight: bold;
-            word-break: break-word;
-        }
-
-        .feedback {
-            margin-top: 20px;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 1.6em;
-            font-weight: bold;
-            display: none;
-            animation: popIn 0.5s;
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .feedback.correct {
-            background: rgba(0, 255, 136, 0.2);
-            border: 3px solid #00ff88;
-            color: #00ff88;
-            display: block;
-        }
-
-        .feedback.wrong {
-            background: rgba(255, 51, 102, 0.2);
-            border: 3px solid #ff3366;
-            color: #ff3366;
-            display: block;
-        }
-
-        .next-btn {
-            width: 100%;
-            padding: 18px;
-            margin-top: 20px;
-            background: linear-gradient(90deg, #ff00ff, #9400d3);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.3em;
-            cursor: pointer;
-            display: none;
-            font-weight: bold;
-        }
-
-        .next-btn:hover {
-            box-shadow: 0 0 30px #ff00ff;
-        }
-
-        #resultsScreen {
-            display: none;
-            text-align: center;
-            padding: 40px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 20px;
-            border: 2px solid #ff00ff;
-        }
-
-        .big-score {
-            font-size: 5em;
-            font-weight: bold;
-            background: linear-gradient(90deg, #ff00ff, #00ffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 20px 0;
-        }
-
-        .result-msg {
-            font-size: 1.8em;
-            margin-bottom: 30px;
-            color: #dda0dd;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .restart-btn {
-            padding: 18px 50px;
-            background: #ff00ff;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 1.3em;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .restart-btn:hover {
-            background: #ff66ff;
-            box-shadow: 0 0 40px #ff00ff;
-        }
-
-        .hidden { display: none !important; }
     </style>
 </head>
-<body>
-    <div class="container">
-        
-        <div id="categoryScreen">
-            <h1>💕 Quiz for my bebe amawa 💕</h1>
-            <p class="subtitle">Match the description to the correct term!</p>
-            
-            <div class="mode-toggle">
-                <span class="toggle-label">Choose Quiz Mode:</span>
-                <div class="toggle-buttons">
-                    <button class="toggle-btn active" id="mcBtn" onclick="setMode('mc')">Multiple Choice</button>
-                    <button class="toggle-btn" id="reciteBtn" onclick="setMode('recite')">Recitation (Type Answer)</button>
-                </div>
+<body class="h-full flex flex-col font-sans overflow-hidden antialiased select-none no-select bg-slate-950">
+
+    <!-- Audio Player Elements -->
+    <audio id="bgm-audio" loop preload="auto" src="theducksong.mp3"></audio>
+    <audio id="sfx-quack" preload="auto" src="duck.mp3"></audio>
+
+    <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-4 py-3 flex items-center justify-between z-30 shadow-md shrink-0">
+        <div class="flex items-center space-x-3">
+            <button id="btn-back-menu" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-slate-200 hidden flex items-center gap-2 text-sm font-semibold">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Level Menu</span>
+            </button>
+            <h1 class="text-xl sm:text-2xl font-black tracking-tight text-amber-400 flex items-center gap-2">
+                <span>🦆</span> SPOT THE DUCKIES
+            </h1>
+        </div>
+
+        <!-- Gameplay Live Stats -->
+        <div id="game-stats" class="hidden flex items-center gap-3 sm:gap-6">
+            <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700/80">
+                <i data-lucide="target" class="w-4 h-4 text-amber-400"></i>
+                <span class="text-xs sm:text-sm font-semibold text-slate-300">Found:</span>
+                <span id="duck-counter" class="text-sm sm:text-base font-bold text-amber-400">0 / 0</span>
             </div>
-            
-            <div class="category-grid">
-                <div class="category-btn" onclick="startQuiz('asian')">
-                    <div class="category-icon">🌏</div>
-                    <div class="category-title">Asian Literature Overview</div>
-                    <div class="category-count">5 Questions</div>
-                    <div class="random-badge">🔀 RANDOMIZED</div>
+            <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700/80">
+                <i data-lucide="clock" class="w-4 h-4 text-cyan-400"></i>
+                <span id="game-timer" class="text-sm sm:text-base font-mono font-bold text-cyan-400">00:00</span>
+            </div>
+        </div>
+
+        <!-- Audio Controls -->
+        <div class="flex items-center space-x-2">
+            <div id="audio-controls" class="hidden flex items-center gap-2 bg-slate-900/60 p-1 rounded-xl border border-slate-700">
+                <button id="btn-toggle-bgm" title="Toggle Background Music" class="p-2 rounded-lg hover:bg-slate-700 transition text-amber-400">
+                    <i id="icon-bgm" data-lucide="music" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
+                <input id="bgm-volume" type="range" min="0" max="1" step="0.05" value="0.5" title="Music Volume" class="w-16 sm:w-20 accent-amber-400 h-1.5 bg-slate-700 rounded-lg cursor-pointer">
+                <button id="btn-toggle-sfx" title="Toggle Sound Effects" class="p-2 rounded-lg hover:bg-slate-700 transition text-emerald-400">
+                    <i id="icon-sfx" data-lucide="volume-2" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 relative overflow-hidden bg-slate-950 flex flex-col">
+
+        <div id="view-home" class="absolute inset-0 z-30 bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+            <div class="max-w-md w-full space-y-8 animate-in fade-in zoom-in-95 duration-300">
+                <div class="space-y-3">
+                    <div class="text-7xl sm:text-8xl animate-bounce">🦆</div>
+                    <h2 class="text-4xl sm:text-5xl font-black text-white tracking-tight">Spot mo duckiess</h2>
+                    <p class="text-slate-400 text-sm sm:text-base">
+                        Hanap hanappp ikaww duckiess hereee
+                    </p>
                 </div>
-                
-                <div class="category-btn" onclick="startQuiz('chinese')">
-                    <div class="category-icon">🐉</div>
-                    <div class="category-title">Chinese Literature</div>
-                    <div class="category-count">6 Questions</div>
-                    <div class="random-badge">🔀 RANDOMIZED</div>
-                </div>
-                
-                <div class="category-btn" onclick="startQuiz('japanese')">
-                    <div class="category-icon">🌸</div>
-                    <div class="category-title">Japanese Literature</div>
-                    <div class="category-count">10 Questions</div>
-                    <div class="random-badge">🔀 RANDOMIZED</div>
-                </div>
-                
-                <div class="category-btn" onclick="startQuiz('korean')">
-                    <div class="category-icon">🎎</div>
-                    <div class="category-title">Korean Literature</div>
-                    <div class="category-count">7 Questions</div>
-                    <div class="random-badge">🔀 RANDOMIZED</div>
-                </div>
-                
-                <div class="category-btn" onclick="startQuiz('indian')">
-                    <div class="category-icon">🕉️</div>
-                    <div class="category-title">Indian Literature</div>
-                    <div class="category-count">7 Questions</div>
-                    <div class="random-badge">🔀 RANDOMIZED</div>
-                </div>
-                
-                <div class="category-btn" onclick="startQuiz('significance')">
-                    <div class="category-icon">⭐</div>
-                    <div class="category-title">Significance & Aged Mother</div>
-                    <div class="category-count">9 Questions</div>
-                    <div class="random-badge">🔀 RANDOMIZED</div>
-                </div>
-                
-                <div class="category-btn" onclick="startQuiz('master')">
-                    <div class="category-icon">👑</div>
-                    <div class="category-title">MASTER QUIZ</div>
-                    <div class="category-count">44 Questions</div>
-                    <div class="random-badge">🔀 FULLY RANDOMIZED</div>
+
+                <div class="space-y-4 pt-4">
+                    <button id="btn-play-now" class="w-full py-4 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xl sm:text-2xl rounded-2xl shadow-2xl hover:shadow-amber-500/20 transform hover:-translate-y-0.5 active:translate-y-0 transition duration-200 flex items-center justify-center gap-3">
+                        <i data-lucide="play" class="w-7 h-7 fill-slate-950"></i> PLAY NOW GRRRR
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div id="quizScreen">
-            <button class="back-btn" onclick="goBack()">← Quit Quiz</button>
-            
-            <div class="mode-indicator" id="modeIndicator">Mode: Multiple Choice</div>
-            
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressBar"></div>
+        <div id="view-level-select" class="absolute inset-0 z-20 hidden overflow-y-auto p-4 sm:p-8 flex flex-col items-center">
+            <div class="max-w-4xl w-full my-auto space-y-6">
+                <div class="text-center space-y-2">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Select ikaw lebel</h2>
+                </div>
+
+                <!-- Dynamically Populated Level Cards -->
+                <div id="level-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 pt-2">
+                    <!-- Javascript populates cards -->
+                </div>
             </div>
+        </div>
+
+        <div id="view-gameplay" class="absolute inset-0 z-10 hidden flex flex-col">
             
-            <div class="counter" id="counter">Question 1 / 10</div>
-            <div class="question" id="questionText">Loading...</div>
-            
-            <!-- Multiple Choice Container -->
-            <div id="mcContainer">
-                <div id="optionsBox"></div>
+            <!-- Zoom & Hint Toolbar -->
+            <div class="absolute top-4 right-4 z-20 flex flex-col sm:flex-row items-end sm:items-center gap-2 bg-slate-800/90 backdrop-blur border border-slate-700 p-1.5 rounded-xl shadow-xl">
+                <button id="btn-hint" class="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-lg shadow flex items-center gap-2 text-xs sm:text-sm transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <span>Hint (<span id="hint-count">3</span>)</span>
+                </button>
+
+                <div class="h-4 w-[1px] bg-slate-700 hidden sm:block"></div>
+
+                <div class="flex items-center gap-1">
+                    <button id="btn-zoom-in" title="Zoom In" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition">
+                        <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                    </button>
+                    <button id="btn-zoom-out" title="Zoom Out" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition">
+                        <i data-lucide="zoom-out" class="w-4 h-4"></i>
+                    </button>
+                    <button id="btn-zoom-reset" title="Reset View" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition text-xs font-bold px-2.5">
+                        100%
+                    </button>
+                </div>
             </div>
-            
-            <!-- Recitation Container -->
-            <div id="reciteContainer" class="recitation-container hidden">
-                <input type="text" class="answer-input" id="answerInput" placeholder="Type your answer here..." autocomplete="off">
-                <div class="caps-warning" id="capsWarning">⚠️ Caps Lock is ON (but it's okay, we check case-insensitive!)</div>
-                <button class="submit-btn" id="submitBtn" onclick="checkRecitation()">Submit Answer ✓</button>
-                
-                <!-- ANSWER DISPLAY BOX - Shows after submitting -->
-                <div id="answerDisplayBox" class="answer-display-box">
-                    <div class="result-title" id="resultTitle"></div>
-                    <div class="your-answer-box" id="yourAnswerBox">
-                        <div class="your-answer-label">Your Answer:</div>
-                        <div class="your-answer-text" id="yourAnswerText"></div>
+
+            <!-- Zoom & Pan Canvas Container -->
+            <div id="viewport-container" class="w-full h-full relative overflow-hidden flex items-center justify-center game-canvas-container">
+                <div id="game-board" class="relative origin-center transition-transform duration-75 ease-out select-none" style="transform: translate(0px, 0px) scale(1);">
+                    
+                    <!-- Level Image -->
+                    <img id="level-image" src="" alt="Level Background" class="max-w-none pointer-events-none rounded-sm shadow-2xl block border border-slate-800" draggable="false" />
+
+                    <!-- Duck Interactive Layer -->
+                    <div id="ducks-layer" class="absolute inset-0 pointer-events-auto">
+                        <!-- Ducks generated here -->
                     </div>
-                    <div class="correct-answer-box">
-                        <div class="correct-answer-label">✓ CORRECT ANSWER:</div>
-                        <div class="correct-answer-text" id="correctAnswerText"></div>
+
+                    <!-- Radar Hint Overlay -->
+                    <div id="radar-signal" class="absolute hidden pointer-events-none -translate-x-1/2 -translate-y-1/2 w-20 h-20">
+                        <div class="w-full h-full rounded-full border-2 border-amber-400 bg-amber-400/20 radar-effect"></div>
                     </div>
                 </div>
             </div>
-            
-            <div class="feedback" id="feedbackBox"></div>
-            <button class="next-btn" id="nextButton" onclick="nextQuestion()">Next Question →</button>
         </div>
 
-        <div id="resultsScreen">
-            <h1>🎉 Quiz Complete! 🎉</h1>
-            <div class="big-score" id="finalScore">0/10</div>
-            <div class="result-msg" id="resultMessage">Great job!</div>
-            <button class="restart-btn" onclick="goBack()">Choose New Quiz ↺</button>
-        </div>
+    </main>
 
+    <div id="modal-win" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <div class="text-6xl animate-bounce">🎉</div>
+            <div>
+                <h3 class="text-2xl font-black text-white">GOOD JOBB MYYY BEBEEEE</h3>
+                <p class="text-slate-400 text-sm mt-1">NAHANAP MO ALL DUCKIES</p>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="grid grid-cols-2 gap-3 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
+                <div>
+                    <span class="text-xs text-slate-400 block">Time Taken</span>
+                    <span id="win-time-stat" class="text-lg font-bold text-cyan-400 font-mono">00:00</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">Ducks Found</span>
+                    <span id="win-ducks-stat" class="text-lg font-bold text-amber-400">0</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3 pt-2">
+                <button id="btn-win-replay" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Wepway
+                </button>
+                <button id="btn-win-next" class="flex-1 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
+                    Nextt oneeee <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const questionDatabase = {
-            asian: [
-                {
-                    q: "Refers to the collection of literary works—including poetry, prose, drama, epics, and folktales—produced by Asian writers across different historical periods and written in various Asian languages.",
-                    options: ["Asian Literature", "European Literature", "American Literature", "African Literature"],
-                    correct: 0,
-                    answer: "Asian Literature"
-                },
-                {
-                    q: "Hinduism, Buddhism, Confucianism, Taoism, and other belief systems shape themes and moral lessons.",
-                    options: ["Politics and Governance", "Religion", "History and Tradition", "Philosophy of Life"],
-                    correct: 1,
-                    answer: "Religion"
-                },
-                {
-                    q: "Dynasties, empires, colonization, and social hierarchies influence perspectives.",
-                    options: ["Religion", "Politics and Governance", "History and Tradition", "Philosophy of Life"],
-                    correct: 1,
-                    answer: "Politics and Governance"
-                },
-                {
-                    q: "Myths, legends, and historical events are preserved through stories.",
-                    options: ["Religion", "Politics and Governance", "History and Tradition", "Philosophy of Life"],
-                    correct: 2,
-                    answer: "History and Tradition"
-                },
-                {
-                    q: "Emphasis on harmony, balance, duty, respect, and collective identity.",
-                    options: ["Religion", "Politics and Governance", "History and Tradition", "Philosophy of Life"],
-                    correct: 3,
-                    answer: "Philosophy of Life"
-                }
-            ],
-            
-            chinese: [
-                {
-                    q: "618–907 CE – Considered the golden age of Chinese poetry.",
-                    options: ["Han Dynasty", "Tang Dynasty", "Song Dynasty", "Ming Dynasty"],
-                    correct: 1,
-                    answer: "Tang Dynasty"
-                },
-                {
-                    q: "The most prestigious literary form in Chinese literature.",
-                    options: ["Drama", "Poetry", "Novel", "Essay"],
-                    correct: 1,
-                    answer: "Poetry"
-                },
-                {
-                    q: "Known for imaginative imagery, romantic expression, and Daoist influence.",
-                    options: ["Tu Fu", "Li Po (Li Bai)", "Matsuo Basho", "Seo Jeong-ju"],
-                    correct: 1,
-                    answer: "Li Po"
-                },
-                {
-                    q: "Known for realism and compassion; his works reflect war, poverty, and social responsibility.",
-                    options: ["Li Po", "Tu Fu (Du Fu)", "Basho", "Tagore"],
-                    correct: 1,
-                    answer: "Tu Fu"
-                },
-                {
-                    q: "Strong use of nature imagery and symbolism.",
-                    options: ["Key characteristic of Chinese poetry", "Key characteristic of Japanese poetry", "Key characteristic of Korean poetry", "Key characteristic of Indian poetry"],
-                    correct: 0,
-                    answer: "Key characteristic of Chinese poetry"
-                },
-                {
-                    q: "Expression of personal emotions to comment on society and politics.",
-                    options: ["Key characteristic of Chinese poetry", "Key characteristic of Japanese poetry", "Key characteristic of Korean poetry", "Key characteristic of Indian poetry"],
-                    correct: 0,
-                    answer: "Key characteristic of Chinese poetry"
-                }
-            ],
-            
-            japanese: [
-                {
-                    q: "A 17-syllable poem (5–7–5) often describing nature and fleeting moments.",
-                    options: ["Noh", "Haiku", "Kabuki", "Sijo"],
-                    correct: 1,
-                    answer: "Haiku"
-                },
-                {
-                    q: "A classical theatrical form combining music, dance, and drama.",
-                    options: ["Haiku", "Noh", "Kabuki", "Hyangga"],
-                    correct: 1,
-                    answer: "Noh"
-                },
-                {
-                    q: "A popular theater form with elaborate costumes and expressive acting.",
-                    options: ["Noh", "Haiku", "Kabuki", "Kasa"],
-                    correct: 2,
-                    answer: "Kabuki"
-                },
-                {
-                    q: "The greatest master of haiku; blended travel, Zen philosophy, and nature imagery.",
-                    options: ["Yosa Buson", "Kobayashi Issa", "Matsuo Basho", "Masaoka Shiki"],
-                    correct: 2,
-                    answer: "Matsuo Basho"
-                },
-                {
-                    q: "Appreciation of nature and impermanence.",
-                    options: ["Mono no aware", "Dharma", "Filial piety", "Zen"],
-                    correct: 0,
-                    answer: "Mono no aware"
-                },
-                {
-                    q: "Primordial deities who created the Japanese islands.",
-                    options: ["Amaterasu and Susano", "Izanagi and Izanami", "Tsukuyomi and Amaterasu", "Raijin and Fujin"],
-                    correct: 1,
-                    answer: "Izanagi and Izanami"
-                },
-                {
-                    q: "Sun Goddess and most important Shinto deity.",
-                    options: ["Moon Goddess", "Amaterasu", "War God", "Sea Goddess"],
-                    correct: 1,
-                    answer: "Amaterasu"
-                },
-                {
-                    q: "Emphasis on emotions and inner experiences.",
-                    options: ["Key feature of Chinese literature", "Key feature of Japanese literature", "Key feature of Korean literature", "Key feature of Indian literature"],
-                    correct: 1,
-                    answer: "Key feature of Japanese literature"
-                },
-                {
-                    q: "Simple language with deep meaning.",
-                    options: ["Key feature of Chinese literature", "Key feature of Japanese literature", "Key feature of Korean literature", "Key feature of Indian literature"],
-                    correct: 1,
-                    answer: "Key feature of Japanese literature"
-                },
-                {
-                    q: "Early Japanese writing was influenced by this literature.",
-                    options: ["Chinese literature", "Korean literature", "Indian literature", "European literature"],
-                    correct: 0,
-                    answer: "Chinese literature"
-                }
-            ],
-            
-            korean: [
-                {
-                    q: "Invented in the 15th century, allowed literature to flourish among common people.",
-                    options: ["Hanja", "Hangul", "Kanji", "Classical Chinese"],
-                    correct: 1,
-                    answer: "Hangul"
-                },
-                {
-                    q: "Early Korean works were written in this.",
-                    options: ["Hangul", "Classical Chinese", "Japanese", "English"],
-                    correct: 1,
-                    answer: "Classical Chinese"
-                },
-                {
-                    q: "Native songs with themes of religion, loyalty, and reflection.",
-                    options: ["Pyŏlgok", "Hyangga", "Sijo", "Kasa"],
-                    correct: 1,
-                    answer: "Hyangga"
-                },
-                {
-                    q: "Poems focusing on love, longing, and emotional struggle.",
-                    options: ["Hyangga", "Pyŏlgok (Changga)", "Sijo", "Kasa"],
-                    correct: 1,
-                    answer: "Pyŏlgok"
-                },
-                {
-                    q: "Three-line poems emphasizing Confucian values and human emotions.",
-                    options: ["Hyangga", "Pyŏlgok", "Sijo", "Kasa"],
-                    correct: 2,
-                    answer: "Sijo"
-                },
-                {
-                    q: "Long narrative poems about war, morality, and seclusion.",
-                    options: ["Hyangga", "Pyŏlgok", "Sijo", "Kasa"],
-                    correct: 3,
-                    answer: "Kasa"
-                },
-                {
-                    q: "A major modern poet influenced by Buddhism and folklore.",
-                    options: ["Li Po", "Matsuo Basho", "Seo Jeong-ju (Midang)", "Rabindranath Tagore"],
-                    correct: 2,
-                    answer: "Seo Jeong-ju"
-                }
-            ],
-            
-            indian: [
-                {
-                    q: "Oldest sacred texts of Hinduism.",
-                    options: ["Upanishads", "Brahmanas", "Vedas", "Puranas"],
-                    correct: 2,
-                    answer: "Vedas"
-                },
-                {
-                    q: "Ritual and sacrificial explanations.",
-                    options: ["Vedas", "Brahmanas", "Upanishads", "Mahabharata"],
-                    correct: 1,
-                    answer: "Brahmanas"
-                },
-                {
-                    q: "Philosophical writings on existence and self.",
-                    options: ["Vedas", "Brahmanas", "Upanishads", "Ramayana"],
-                    correct: 2,
-                    answer: "Upanishads"
-                },
-                {
-                    q: "Explores duty (dharma), war, and morality.",
-                    options: ["Ramayana", "Mahabharata", "Vedas", "Upanishads"],
-                    correct: 1,
-                    answer: "Mahabharata"
-                },
-                {
-                    q: "Focuses on loyalty, honor, and ideal leadership.",
-                    options: ["Mahabharata", "Ramayana", "Vedas", "Brahmanas"],
-                    correct: 1,
-                    answer: "Ramayana"
-                },
-                {
-                    q: "First Asian Nobel Prize winner in Literature (1913).",
-                    options: ["Haruki Murakami", "Rabindranath Tagore", "Lu Xun", "Kazuo Ishiguro"],
-                    correct: 1,
-                    answer: "Rabindranath Tagore"
-                },
-                {
-                    q: "Indian literature is deeply connected to this.",
-                    options: ["Only politics", "Religion, philosophy, and moral teachings", "Only technology", "Only Western culture"],
-                    correct: 1,
-                    answer: "Religion, philosophy, and moral teachings"
-                }
-            ],
-            
-            significance: [
-                {
-                    q: "Preserves cultural heritage and identity.",
-                    options: ["Significance of Asian Literature", "Definition of Asian Literature", "Theme of Aged Mother", "None of the above"],
-                    correct: 0,
-                    answer: "Significance of Asian Literature"
-                },
-                {
-                    q: "Promotes intercultural understanding.",
-                    options: ["Significance of Asian Literature", "Definition of Asian Literature", "Theme of Aged Mother", "None of the above"],
-                    correct: 0,
-                    answer: "Significance of Asian Literature"
-                },
-                {
-                    q: "Influences global literary movements.",
-                    options: ["Significance of Asian Literature", "Definition of Asian Literature", "Theme of Aged Mother", "None of the above"],
-                    correct: 0,
-                    answer: "Significance of Asian Literature"
-                },
-                {
-                    q: "Presents universal themes such as love, struggle, faith, and humanity.",
-                    options: ["Significance of Asian Literature", "Definition of Asian Literature", "Theme of Aged Mother", "None of the above"],
-                    correct: 0,
-                    answer: "Significance of Asian Literature"
-                },
-                {
-                    q: "Japanese Folktale that reflects values of filial piety, respect for elders, and wisdom.",
-                    options: ["Tale of the Nine-Tailed", "The Story of an Aged Mother", "Naruto", "Mahabharata"],
-                    correct: 1,
-                    answer: "The Story of an Aged Mother"
-                },
-                {
-                    q: "What law did the ruler impose on the aged?",
-                    options: ["All aged people must be abandoned", "All young men must join the army", "All women must work", "Extra taxes"],
-                    correct: 0,
-                    answer: "All aged people must be abandoned"
-                },
-                {
-                    q: "How did the son show love for his mother?",
-                    options: ["He obeyed the law", "He secretly hid and protected his mother", "He left her", "He told everyone"],
-                    correct: 1,
-                    answer: "He secretly hid and protected his mother"
-                },
-                {
-                    q: "How did the aged mother show wisdom?",
-                    options: ["By fighting", "By providing clever solutions to challenges", "By running away", "By staying silent"],
-                    correct: 1,
-                    answer: "By providing clever solutions to challenges"
-                },
-                {
-                    q: "What lesson about respecting elders does the story teach?",
-                    options: ["Elders are useless", "Elders are valuable members whose wisdom should be respected", "Young people know best", "Rulers are always right"],
-                    correct: 1,
-                    answer: "Elders are valuable members whose wisdom should be respected"
-                }
-            ]
+        // SVG Vector Graphic Fallbacks for Instant Playability
+        const SVG_FALLBACKS = [
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="400" fill="%2338bdf8"/><circle cx="850" cy="100" r="50" fill="%23fde047"/><ellipse cx="200" cy="420" rx="350" ry="150" fill="%234ade80"/><ellipse cx="750" cy="420" rx="400" ry="180" fill="%2315803d"/><rect y="380" width="1000" height="270" fill="%2322c55e"/><ellipse cx="500" cy="520" rx="320" ry="100" fill="%230284c7"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="450" fill="%23fb923c"/><circle cx="500" cy="350" r="180" fill="%23facc15"/><rect y="420" width="1000" height="230" fill="%230284c7"/><path d="M0 450 Q 250 400, 500 450 T 1000 450 L 1000 650 L 0 650 Z" fill="%230369a1"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="650" fill="%23065f46"/><path d="M 0 300 L 200 150 L 400 300 L 600 100 L 800 280 L 1000 200 L 1000 650 L 0 650 Z" fill="%23047857"/><ellipse cx="300" cy="500" rx="250" ry="80" fill="%230ea5e9"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="650" fill="%231e1b4b"/><circle cx="200" cy="150" r="40" fill="%23fef08a"/><rect y="500" width="1000" height="150" fill="%23312e81"/></svg>'
+        ];
+
+        // High resolution online fallback images
+        const UNSPLASH_FALLBACKS = [
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+            'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80',
+            'https://images.unsplash.com/photo-1511497584788-876761c11969?auto=format&fit=crop&w=1200&q=80',
+            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80'
+        ];
+
+        // Level Definitions mapped to 'background/' folder
+        const LEVELS_CONFIG = [
+            { id: "level1", title: "Level 1", image: "background/level1.jpg", fallbackImage: "background/level1.png", unsplash: UNSPLASH_FALLBACKS[0], svg: SVG_FALLBACKS[0] },
+            { id: "level2", title: "Level 2", image: "background/level2.jpg", fallbackImage: "background/level2.png", unsplash: UNSPLASH_FALLBACKS[1], svg: SVG_FALLBACKS[1] },
+            { id: "level3", title: "Level 3", image: "background/level3.jpg", fallbackImage: "background/level3.png", unsplash: UNSPLASH_FALLBACKS[2], svg: SVG_FALLBACKS[2] },
+            { id: "level4", title: "Level 4", image: "background/level4.jpg", fallbackImage: "background/level4.png", unsplash: UNSPLASH_FALLBACKS[3], svg: SVG_FALLBACKS[3] }
+        ];
+
+        // Active Game State
+        let currentLevel = null;
+        let generatedDucks = [];
+        let foundDucks = new Set();
+        let hintsRemaining = 3;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        
+        // Pan and Zoom
+        let scale = 1;
+        let panX = 0;
+        let panY = 0;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+
+        // Audio Settings
+        let bgmMuted = false;
+        let sfxMuted = false;
+        let audioContext = null;
+
+        // Cache DOM Elements
+        const DOM = {
+            bgmAudio: document.getElementById('bgm-audio'),
+            sfxQuack: document.getElementById('sfx-quack'),
+            bgmVolume: document.getElementById('bgm-volume'),
+            btnToggleBgm: document.getElementById('btn-toggle-bgm'),
+            btnToggleSfx: document.getElementById('btn-toggle-sfx'),
+            iconBgm: document.getElementById('icon-bgm'),
+            iconSfx: document.getElementById('icon-sfx'),
+            audioControls: document.getElementById('audio-controls'),
+            viewHome: document.getElementById('view-home'),
+            viewLevelSelect: document.getElementById('view-level-select'),
+            viewGameplay: document.getElementById('view-gameplay'),
+            btnPlayNow: document.getElementById('btn-play-now'),
+            levelGrid: document.getElementById('level-grid'),
+            btnBackMenu: document.getElementById('btn-back-menu'),
+            gameStats: document.getElementById('game-stats'),
+            duckCounter: document.getElementById('duck-counter'),
+            gameTimer: document.getElementById('game-timer'),
+            viewportContainer: document.getElementById('viewport-container'),
+            gameBoard: document.getElementById('game-board'),
+            levelImage: document.getElementById('level-image'),
+            ducksLayer: document.getElementById('ducks-layer'),
+            radarSignal: document.getElementById('radar-signal'),
+            btnHint: document.getElementById('btn-hint'),
+            hintCount: document.getElementById('hint-count'),
+            btnZoomIn: document.getElementById('btn-zoom-in'),
+            btnZoomOut: document.getElementById('btn-zoom-out'),
+            btnZoomReset: document.getElementById('btn-zoom-reset'),
+            modalWin: document.getElementById('modal-win'),
+            winTimeStat: document.getElementById('win-time-stat'),
+            winDucksStat: document.getElementById('win-ducks-stat'),
+            btnWinReplay: document.getElementById('btn-win-replay'),
+            btnWinNext: document.getElementById('btn-win-next')
         };
 
-        let currentQuestions = [];
-        let currentIndex = 0;
-        let score = 0;
-        let answered = false;
-        let quizMode = 'mc';
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderLevelGrid();
+            setupEventListeners();
+            setupPanAndZoom();
+        });
 
-        function setMode(mode) {
-            quizMode = mode;
-            document.getElementById('mcBtn').classList.toggle('active', mode === 'mc');
-            document.getElementById('reciteBtn').classList.toggle('active', mode === 'recite');
+        function setupEventListeners() {
+            // PLAY NOW -> Direct level start
+            DOM.btnPlayNow.addEventListener('click', () => {
+                startBGM();
+                DOM.viewHome.classList.add('hidden');
+                DOM.audioControls.classList.remove('hidden');
+                startLevel(LEVELS_CONFIG[0].id);
+            });
+
+            // Audio Controls
+            DOM.btnToggleBgm.addEventListener('click', toggleBGM);
+            DOM.btnToggleSfx.addEventListener('click', toggleSFX);
+            DOM.bgmVolume.addEventListener('input', (e) => {
+                DOM.bgmAudio.volume = e.target.value;
+            });
+
+            // Navigation
+            DOM.btnBackMenu.addEventListener('click', showLevelSelect);
+
+            // Gameplay Controls
+            DOM.btnHint.addEventListener('click', triggerHint);
+            DOM.btnZoomIn.addEventListener('click', () => adjustZoom(0.25));
+            DOM.btnZoomOut.addEventListener('click', () => adjustZoom(-0.25));
+            DOM.btnZoomReset.addEventListener('click', resetZoomAndPan);
+
+            // Win Modal Actions
+            DOM.btnWinReplay.addEventListener('click', () => {
+                DOM.modalWin.classList.add('hidden');
+                startLevel(currentLevel.id);
+            });
+            DOM.btnWinNext.addEventListener('click', () => {
+                DOM.modalWin.classList.add('hidden');
+                const currentIndex = LEVELS_CONFIG.findIndex(l => l.id === currentLevel.id);
+                const nextIndex = (currentIndex + 1) % LEVELS_CONFIG.length;
+                startLevel(LEVELS_CONFIG[nextIndex].id);
+            });
         }
 
-        function shuffleArray(array) {
-            const newArray = [...array];
-            for (let i = newArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-            }
-            return newArray;
-        }
-
-        function startQuiz(category) {
-            if (category === 'master') {
-                let allQuestions = [];
-                Object.values(questionDatabase).forEach(qArray => {
-                    allQuestions = allQuestions.concat(qArray);
+        // Background Music Handler
+        function startBGM() {
+            if (!bgmMuted) {
+                DOM.bgmAudio.volume = parseFloat(DOM.bgmVolume.value);
+                DOM.bgmAudio.play().catch(err => {
+                    console.warn("Background music play prevented:", err);
                 });
-                currentQuestions = shuffleArray(allQuestions);
-            } else {
-                currentQuestions = shuffleArray(questionDatabase[category]);
             }
-            
-            currentIndex = 0;
-            score = 0;
-            answered = false;
-            
-            document.getElementById('categoryScreen').style.display = 'none';
-            document.getElementById('quizScreen').style.display = 'block';
-            document.getElementById('resultsScreen').style.display = 'none';
-            
-            document.getElementById('modeIndicator').textContent = 
-                quizMode === 'mc' ? 'Mode: Multiple Choice' : 'Mode: Recitation (Type Answer)';
-            
-            if (quizMode === 'mc') {
-                document.getElementById('mcContainer').classList.remove('hidden');
-                document.getElementById('reciteContainer').classList.add('hidden');
-            } else {
-                document.getElementById('mcContainer').classList.add('hidden');
-                document.getElementById('reciteContainer').classList.remove('hidden');
-            }
-            
-            showQuestion();
         }
 
-        function showQuestion() {
-            answered = false;
-            const q = currentQuestions[currentIndex];
+        function renderLevelGrid() {
+            DOM.levelGrid.innerHTML = '';
             
-            document.getElementById('counter').textContent = 
-                `Question ${currentIndex + 1} / ${currentQuestions.length}`;
-            
-            document.getElementById('questionText').textContent = q.q;
-            
-            const progress = ((currentIndex) / currentQuestions.length) * 100;
-            document.getElementById('progressBar').style.width = progress + '%';
-            
-            // Reset all displays
-            document.getElementById('feedbackBox').style.display = 'none';
-            document.getElementById('feedbackBox').className = 'feedback';
-            document.getElementById('nextButton').style.display = 'none';
-            
-            // Hide answer display box
-            const answerBox = document.getElementById('answerDisplayBox');
-            answerBox.classList.remove('show', 'correct-answer', 'wrong-answer');
-            answerBox.style.display = 'none';
-            
-            if (quizMode === 'mc') {
-                const box = document.getElementById('optionsBox');
-                box.innerHTML = '';
+            LEVELS_CONFIG.forEach((level, index) => {
+                const bestTime = localStorage.getItem(`spot_duck_best_${level.id}`);
+                const isCompleted = localStorage.getItem(`spot_duck_completed_${level.id}`) === 'true';
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800/80 border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl hover:border-amber-400/50 transition duration-300 flex flex-col group cursor-pointer';
                 
-                q.options.forEach((opt, idx) => {
-                    const div = document.createElement('div');
-                    div.className = 'option';
-                    div.textContent = opt;
-                    div.onclick = () => checkMCAnswer(idx);
-                    box.appendChild(div);
+                card.innerHTML = `
+                    <div class="relative h-44 bg-slate-900 overflow-hidden">
+                        <img src="${level.image}" alt="${level.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
+                             onerror="this.onerror=null; this.src='${level.unsplash}'; this.onerror=function(){ this.src='${level.svg}'; };">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+                        ${isCompleted ? `
+                            <div class="absolute top-3 right-3 bg-emerald-500/90 backdrop-blur text-slate-950 font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Cleared
+                            </div>
+                        ` : ''}
+                        <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+                            <div>
+                                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Level ${index + 1}</span>
+                                <h3 class="text-lg font-extrabold text-white leading-tight">${level.title}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-800 flex justify-between items-center text-xs text-slate-400">
+                        <span>Best Time: <strong class="text-slate-200 font-mono">${bestTime ? formatTime(parseInt(bestTime)) : '--:--'}</strong></span>
+                        <button class="px-4 py-2 bg-amber-500 group-hover:bg-amber-400 text-slate-950 font-black rounded-xl transition">
+                            PLAY
+                        </button>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => startLevel(level.id));
+                DOM.levelGrid.appendChild(card);
+            });
+            
+            lucide.createIcons();
+        }
+
+        function startLevel(levelId) {
+            currentLevel = LEVELS_CONFIG.find(l => l.id === levelId);
+            if (!currentLevel) return;
+
+            // Generate Random Ducks (between 5 and 10)
+            const count = Math.floor(Math.random() * 6) + 5; 
+            generatedDucks = [];
+
+            for (let i = 0; i < count; i++) {
+                generatedDucks.push({
+                    x: Math.floor(Math.random() * 80) + 10,
+                    y: Math.floor(Math.random() * 75) + 12,
+                    size: Math.floor(Math.random() * 8) + 26
                 });
-            } else {
-                const input = document.getElementById('answerInput');
-                const submitBtn = document.getElementById('submitBtn');
+            }
+
+            foundDucks.clear();
+            hintsRemaining = 3;
+            secondsElapsed = 0;
+
+            // Update UI Counters
+            DOM.duckCounter.textContent = `0 / ${generatedDucks.length}`;
+            DOM.hintCount.textContent = hintsRemaining;
+            DOM.btnHint.disabled = false;
+
+            // Switch Views
+            DOM.viewLevelSelect.classList.add('hidden');
+            DOM.viewGameplay.classList.remove('hidden');
+            DOM.btnBackMenu.classList.remove('hidden');
+            DOM.gameStats.classList.remove('hidden');
+
+            // Load Image with Cascading Fallbacks
+            DOM.levelImage.src = currentLevel.image;
+            DOM.levelImage.onerror = () => {
+                if (DOM.levelImage.src.includes('.jpg')) {
+                    DOM.levelImage.src = currentLevel.fallbackImage;
+                } else if (!DOM.levelImage.src.includes('unsplash')) {
+                    DOM.levelImage.src = currentLevel.unsplash;
+                } else {
+                    DOM.levelImage.src = currentLevel.svg;
+                }
+            };
+
+            DOM.levelImage.onload = () => {
+                resetZoomAndPan();
+            };
+
+            renderDucks();
+            startTimer();
+            resetZoomAndPan();
+        }
+
+        function showLevelSelect() {
+            stopTimer();
+            DOM.viewGameplay.classList.add('hidden');
+            DOM.viewLevelSelect.classList.remove('hidden');
+            DOM.btnBackMenu.classList.add('hidden');
+            DOM.gameStats.classList.add('hidden');
+            renderLevelGrid();
+        }
+
+        function renderDucks() {
+            DOM.ducksLayer.innerHTML = '';
+
+            generatedDucks.forEach((duck, index) => {
+                const duckEl = document.createElement('div');
+
+                duckEl.className = 'absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform duration-200 hover:scale-125';
+                duckEl.style.left = `${duck.x}%`;
+                duckEl.style.top = `${duck.y}%`;
+                duckEl.style.width = `${duck.size}px`;
+                duckEl.style.height = `${duck.size}px`;
+
+                // Rubber Duck Graphic
+                duckEl.innerHTML = `
+                    <div class="duck-svg-wrapper w-full h-full drop-shadow-md">
+                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                            <path d="M12 36C12 28 20 24 32 24C44 24 54 30 54 40C54 48 44 52 32 52C18 52 12 46 12 36Z" fill="#FACC15"/>
+                            <path d="M10 38C10 30 18 26 30 26C38 26 44 28 48 32C42 34 38 40 38 48C24 48 10 46 10 38Z" fill="#EAB308"/>
+                            <circle cx="44" cy="20" r="12" fill="#FACC15"/>
+                            <path d="M52 20C52 20 62 21 60 25C58 29 50 26 50 26Z" fill="#F97316"/>
+                            <circle cx="46" cy="18" r="2.5" fill="#0F172A"/>
+                            <circle cx="47" cy="17" r="1" fill="#FFFFFF"/>
+                            <path d="M22 36C22 32 28 32 32 36C34 40 28 44 22 40C20 38 20 37 22 40C20 38 20 37 22 40C20 38 20 37 22 36Z" fill="#CA8A04"/>
+                        </svg>
+                    </div>
+                `;
+
+                duckEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    onDuckClicked(index, duckEl);
+                });
+
+                DOM.ducksLayer.appendChild(duckEl);
+            });
+        }
+
+        function onDuckClicked(index, element) {
+            if (foundDucks.has(index)) return;
+
+            foundDucks.add(index);
+            playQuackSFX();
+
+            element.classList.add('duck-found-anim');
+            element.innerHTML = `
+                <div class="relative w-full h-full flex items-center justify-center">
+                    <span class="text-2xl drop-shadow-lg">🦆</span>
+                    <div class="absolute -top-2 -right-2 bg-emerald-500 text-slate-950 rounded-full p-0.5 shadow">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                </div>
+            `;
+
+            DOM.duckCounter.textContent = `${foundDucks.size} / ${generatedDucks.length}`;
+
+            if (foundDucks.size === generatedDucks.length) {
+                setTimeout(handleWin, 500);
+            }
+        }
+
+        // SFX Player with Web Audio API Synthesizer Fallback
+        function playQuackSFX() {
+            if (sfxMuted) return;
+
+            DOM.sfxQuack.currentTime = 0;
+            const playPromise = DOM.sfxQuack.play();
+
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    playSyntheticQuack();
+                });
+            }
+        }
+
+        function playSyntheticQuack() {
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
                 
-                input.value = '';
-                input.disabled = false;
-                submitBtn.disabled = false;
-                input.focus();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(400, audioContext.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.15);
                 
-                input.onkeypress = function(e) {
-                    if (e.key === 'Enter' && !answered) {
-                        checkRecitation();
-                    }
-                };
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
                 
-                input.onkeyup = function(e) {
-                    const warning = document.getElementById('capsWarning');
-                    if (e.getModifierState && e.getModifierState('CapsLock')) {
-                        warning.style.display = 'block';
-                    } else {
-                        warning.style.display = 'none';
-                    }
-                };
-            }
-        }
-
-        function checkMCAnswer(selected) {
-            if (answered) return;
-            answered = true;
-            
-            const q = currentQuestions[currentIndex];
-            const options = document.querySelectorAll('.option');
-            const feedback = document.getElementById('feedbackBox');
-            
-            options.forEach(opt => opt.classList.add('disabled'));
-            options[q.correct].classList.add('correct');
-            
-            if (selected === q.correct) {
-                score++;
-                options[selected].classList.add('correct');
-                feedback.innerHTML = '✨💖 Good Job, Baby';
-                feedback.className = 'feedback correct';
-            } else {
-                options[selected].classList.add('wrong');
-                feedback.innerHTML = '😢💔 Wrong Answer Baby :(';
-                feedback.className = 'feedback wrong';
-            }
-            
-            feedback.style.display = 'block';
-            finishQuestion();
-        }
-
-        function checkRecitation() {
-            if (answered) return;
-            
-            const input = document.getElementById('answerInput');
-            const submitBtn = document.getElementById('submitBtn');
-            const userAnswer = input.value.trim();
-            
-            if (userAnswer === '') {
-                alert('Please type an answer bebe! 💕');
-                return;
-            }
-            
-            answered = true;
-            
-            const q = currentQuestions[currentIndex];
-            const correctAnswer = q.answer;
-            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
-            
-            // Disable input and button
-            input.disabled = true;
-            submitBtn.disabled = true;
-            
-            // Show answer display box
-            const answerBox = document.getElementById('answerDisplayBox');
-            const resultTitle = document.getElementById('resultTitle');
-            const yourAnswerText = document.getElementById('yourAnswerText');
-            const correctAnswerText = document.getElementById('correctAnswerText');
-            
-            yourAnswerText.textContent = userAnswer || '(empty)';
-            correctAnswerText.textContent = correctAnswer;
-            
-            if (isCorrect) {
-                score++;
-                answerBox.classList.add('correct-answer');
-                answerBox.classList.remove('wrong-answer');
-                resultTitle.innerHTML = '✨💖 Good Job, Baby';
-            } else {
-                answerBox.classList.add('wrong-answer');
-                answerBox.classList.remove('correct-answer');
-                resultTitle.innerHTML = '😢💔 Wrong Answer Baby :(';
-            }
-            
-            answerBox.style.display = 'block';
-            answerBox.classList.add('show');
-            
-            finishQuestion();
-        }
-
-        function finishQuestion() {
-            const progress = ((currentIndex + 1) / currentQuestions.length) * 100;
-            document.getElementById('progressBar').style.width = progress + '%';
-            
-            document.getElementById('nextButton').style.display = 'block';
-            
-            if (currentIndex === currentQuestions.length - 1) {
-                document.getElementById('nextButton').textContent = 'See Results 🎉';
-            } else {
-                document.getElementById('nextButton').textContent = 'Next Question →';
-            }
-        }
-
-        function nextQuestion() {
-            if (quizMode === 'recite') {
-                document.getElementById('answerInput').disabled = false;
-                document.getElementById('submitBtn').disabled = false;
-                document.getElementById('answerInput').value = '';
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
                 
-                // Hide answer box
-                const answerBox = document.getElementById('answerDisplayBox');
-                answerBox.classList.remove('show', 'correct-answer', 'wrong-answer');
-                answerBox.style.display = 'none';
-            }
-            
-            currentIndex++;
-            if (currentIndex < currentQuestions.length) {
-                showQuestion();
-            } else {
-                showResults();
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.15);
+            } catch (e) {
+                console.warn("Synth quack error:", e);
             }
         }
 
-        function showResults() {
-            document.getElementById('quizScreen').style.display = 'none';
-            document.getElementById('resultsScreen').style.display = 'block';
-            
-            const total = currentQuestions.length;
-            document.getElementById('finalScore').textContent = `${score}/${total}`;
-            
-            const percentage = (score / total) * 100;
-            let message = '';
-            
-            if (percentage === 100) {
-                message = '👑 GOOJOB BABY! PERFECTT MANNN YANNN! 💕✨';
-            } else if (percentage >= 90) {
-                message = '🌟 GOODJOB BEBE! ANG GALEEENGGG! 💖';
-            } else if (percentage >= 80) {
-                message = '🎉 LAPIT NAA BEBE! LAPIT NA MAPERFECT! 💝';
-            } else if (percentage >= 70) {
-                message = '💪 LAPIT NAA BABYY! GO SEXY GO SEXY! 💕';
-            } else if (percentage >= 60) {
-                message = '📚 GAWINGG MANN BEBEE! LAPIT NAA! 💗';
-            } else if (percentage >= 50) {
-                message = '💝 GAWING MAN BABYYY!  💖';
+        // Toggle Audio Settings
+        function toggleBGM() {
+            bgmMuted = !bgmMuted;
+            if (bgmMuted) {
+                DOM.bgmAudio.pause();
+                DOM.btnToggleBgm.classList.add('opacity-50');
+                DOM.iconBgm.setAttribute('data-lucide', 'music-2');
             } else {
-                message = '💪 READD HANDOUTTT BABEEEE! 💕';
+                DOM.bgmAudio.play().catch(() => {});
+                DOM.btnToggleBgm.classList.remove('opacity-50');
+                DOM.iconBgm.setAttribute('data-lucide', 'music');
             }
-            
-            document.getElementById('resultMessage').textContent = message;
+            lucide.createIcons();
         }
 
-        function goBack() {
-            document.getElementById('categoryScreen').style.display = 'block';
-            document.getElementById('quizScreen').style.display = 'none';
-            document.getElementById('resultsScreen').style.display = 'none';
-            
-            document.getElementById('answerInput').disabled = false;
-            document.getElementById('submitBtn').disabled = false;
-            document.getElementById('answerInput').value = '';
-            
-            // Hide answer box
-            const answerBox = document.getElementById('answerDisplayBox');
-            answerBox.classList.remove('show', 'correct-answer', 'wrong-answer');
-            answerBox.style.display = 'none';
+        function toggleSFX() {
+            sfxMuted = !sfxMuted;
+            if (sfxMuted) {
+                DOM.btnToggleSfx.classList.add('opacity-50');
+                DOM.iconSfx.setAttribute('data-lucide', 'volume-x');
+            } else {
+                DOM.btnToggleSfx.classList.remove('opacity-50');
+                DOM.iconSfx.setAttribute('data-lucide', 'volume-2');
+            }
+            lucide.createIcons();
+        }
+
+        function triggerHint() {
+            if (hintsRemaining <= 0) return;
+
+            const unfoundIndices = generatedDucks
+                .map((_, idx) => idx)
+                .filter(idx => !foundDucks.has(idx));
+
+            if (unfoundIndices.length === 0) return;
+
+            const targetIndex = unfoundIndices[Math.floor(Math.random() * unfoundIndices.length)];
+            const targetDuck = generatedDucks[targetIndex];
+
+            DOM.radarSignal.style.left = `${targetDuck.x}%`;
+            DOM.radarSignal.style.top = `${targetDuck.y}%`;
+            DOM.radarSignal.classList.remove('hidden');
+
+            hintsRemaining--;
+            DOM.hintCount.textContent = hintsRemaining;
+            if (hintsRemaining <= 0) {
+                DOM.btnHint.disabled = true;
+            }
+
+            setTimeout(() => {
+                DOM.radarSignal.classList.add('hidden');
+            }, 3600);
+        }
+
+        function handleWin() {
+            stopTimer();
+
+            const levelKey = `spot_duck_best_${currentLevel.id}`;
+            const existingBest = localStorage.getItem(levelKey);
+            if (!existingBest || secondsElapsed < parseInt(existingBest)) {
+                localStorage.setItem(levelKey, secondsElapsed.toString());
+            }
+            localStorage.setItem(`spot_duck_completed_${currentLevel.id}`, 'true');
+
+            DOM.winTimeStat.textContent = formatTime(secondsElapsed);
+            DOM.winDucksStat.textContent = generatedDucks.length.toString();
+            DOM.modalWin.classList.remove('hidden');
+
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function setupPanAndZoom() {
+            const container = DOM.viewportContainer;
+
+            container.addEventListener('mousedown', (e) => {
+                if (e.target.closest('#ducks-layer > div')) return;
+                isDragging = true;
+                dragStartX = e.clientX - panX;
+                dragStartY = e.clientY - panY;
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                panX = e.clientX - dragStartX;
+                panY = e.clientY - dragStartY;
+                updateTransform();
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            container.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isDragging = true;
+                    dragStartX = e.touches[0].clientX - panX;
+                    dragStartY = e.touches[0].clientY - panY;
+                }
+            }, { passive: true });
+
+            container.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches.length === 1) {
+                    panX = e.touches[0].clientX - dragStartX;
+                    panY = e.touches[0].clientY - dragStartY;
+                    updateTransform();
+                }
+            }, { passive: true });
+
+            container.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 0.15 : -0.15;
+                adjustZoom(delta);
+            }, { passive: false });
+        }
+
+        function adjustZoom(delta) {
+            scale = Math.min(Math.max(0.8, scale + delta), 3.5);
+            DOM.btnZoomReset.textContent = `${Math.round(scale * 100)}%`;
+            updateTransform();
+        }
+
+        function resetZoomAndPan() {
+            scale = 1;
+            panX = 0;
+            panY = 0;
+            DOM.btnZoomReset.textContent = '100%';
+            updateTransform();
+        }
+
+        function updateTransform() {
+            DOM.gameBoard.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        }
+
+        // Timer Helpers
+        function startTimer() {
+            stopTimer();
+            secondsElapsed = 0;
+            DOM.gameTimer.textContent = '00:00';
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                DOM.gameTimer.textContent = formatTime(secondsElapsed);
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            return `${mins}:${secs}`;
         }
     </script>
 </body>
