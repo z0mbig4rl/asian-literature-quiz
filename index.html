@@ -2,7 +2,7 @@
 <html lang="en" class="h-full bg-slate-900 text-slate-100">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Spot the Duck</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,32 +11,18 @@
     <!-- Canvas Confetti CDN -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
-        
-        .no-select {
+        * {
+            box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
-
-        .game-canvas-container {
-            cursor: grab;
-            touch-action: none;
-        }
-        .game-canvas-container:active {
-            cursor: grabbing;
+        body {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #020617;
         }
 
         @keyframes radar-pulse {
@@ -58,49 +44,48 @@
         }
     </style>
 </head>
-<body class="h-full flex flex-col font-sans overflow-hidden antialiased select-none no-select bg-slate-950">
+<body class="h-full flex flex-col font-sans overflow-hidden antialiased select-none bg-slate-950">
 
     <!-- Audio Player Elements -->
     <audio id="bgm-audio" loop preload="auto" src="theducksong.mp3"></audio>
     <audio id="sfx-quack" preload="auto" src="duck.mp3"></audio>
 
-    <header class="bg-slate-800/95 backdrop-blur border-b border-slate-700 px-4 py-3 flex items-center justify-between z-30 shadow-md shrink-0">
+    <header class="bg-slate-800/95 backdrop-blur border-b border-slate-700 px-4 py-2.5 flex items-center justify-between z-30 shadow-md shrink-0">
         <div class="flex items-center space-x-3">
             <button id="btn-back-menu" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-slate-200 hidden flex items-center gap-2 text-sm font-semibold">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 <span class="hidden sm:inline">Level Menu</span>
             </button>
-            <h1 class="text-xl sm:text-2xl font-black tracking-tight text-amber-400 flex items-center gap-2">
+            <h1 class="text-lg sm:text-2xl font-black tracking-tight text-amber-400 flex items-center gap-2">
                 <span>🦆</span> SPOT THE DUCKIES
             </h1>
         </div>
 
-        <div id="game-stats" class="hidden flex items-center gap-3 sm:gap-6">
-            <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700/80">
-                <i data-lucide="target" class="w-4 h-4 text-amber-400"></i>
-                <span class="text-xs sm:text-sm font-semibold text-slate-300">Found:</span>
-                <span id="duck-counter" class="text-sm sm:text-base font-bold text-amber-400">0 / 0</span>
+        <div id="game-stats" class="hidden flex items-center gap-2 sm:gap-4">
+            <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded-full border border-slate-700/80">
+                <i data-lucide="target" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span class="text-xs font-semibold text-slate-300">Found:</span>
+                <span id="duck-counter" class="text-xs sm:text-sm font-bold text-amber-400">0 / 0</span>
             </div>
-            <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700/80">
-                <i data-lucide="clock" class="w-4 h-4 text-cyan-400"></i>
-                <span id="game-timer" class="text-sm sm:text-base font-mono font-bold text-cyan-400">00:00</span>
+            <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded-full border border-slate-700/80">
+                <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span id="game-timer" class="text-xs sm:text-sm font-mono font-bold text-cyan-400">00:00</span>
             </div>
         </div>
 
         <div class="flex items-center space-x-2">
             <div id="audio-controls" class="hidden flex items-center gap-2 bg-slate-900/60 p-1 rounded-xl border border-slate-700">
-                <button id="btn-toggle-bgm" title="Toggle Background Music" class="p-2 rounded-lg hover:bg-slate-700 transition text-amber-400">
-                    <i id="icon-bgm" data-lucide="music" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                <button id="btn-toggle-bgm" title="Toggle Background Music" class="p-1.5 rounded-lg hover:bg-slate-700 transition text-amber-400">
+                    <i id="icon-bgm" data-lucide="music" class="w-4 h-4"></i>
                 </button>
-                <input id="bgm-volume" type="range" min="0" max="1" step="0.05" value="0.5" title="Music Volume" class="w-16 sm:w-20 accent-amber-400 h-1.5 bg-slate-700 rounded-lg cursor-pointer">
-                <button id="btn-toggle-sfx" title="Toggle Sound Effects" class="p-2 rounded-lg hover:bg-slate-700 transition text-emerald-400">
-                    <i id="icon-sfx" data-lucide="volume-2" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                <button id="btn-toggle-sfx" title="Toggle Sound Effects" class="p-1.5 rounded-lg hover:bg-slate-700 transition text-emerald-400">
+                    <i id="icon-sfx" data-lucide="volume-2" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 relative overflow-hidden bg-slate-950 flex flex-col">
+    <main class="flex-1 relative overflow-hidden bg-slate-950 flex flex-col items-center justify-center">
 
         <!-- Home Screen -->
         <div id="view-home" class="absolute inset-0 z-30 bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
@@ -114,7 +99,7 @@
                 </div>
 
                 <div class="space-y-4 pt-4">
-                    <button id="btn-play-now" class="w-full py-4 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xl sm:text-2xl rounded-2xl shadow-2xl transform hover:-translate-y-0.5 active:translate-y-0 transition duration-200 flex items-center justify-center gap-3">
+                    <button id="btn-play-now" class="w-full py-4 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xl sm:text-2xl rounded-2xl shadow-2xl transform active:scale-95 transition duration-200 flex items-center justify-center gap-3">
                         <i data-lucide="play" class="w-7 h-7 fill-slate-950"></i> PLAY NOW GRRRR
                     </button>
                 </div>
@@ -122,42 +107,33 @@
         </div>
 
         <!-- Level Select View -->
-        <div id="view-level-select" class="absolute inset-0 z-20 hidden overflow-y-auto p-4 sm:p-8 flex flex-col items-center">
-            <div class="max-w-4xl w-full my-auto space-y-6">
-                <div class="text-center space-y-2">
-                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Select ikaw lebel</h2>
+        <div id="view-level-select" class="absolute inset-0 z-20 hidden overflow-y-auto p-4 flex flex-col items-center justify-center">
+            <div class="max-w-xl w-full space-y-4">
+                <div class="text-center space-y-1">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Select ikaw lebel</h2>
                 </div>
-                <div id="level-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 pt-2"></div>
+                <div id="level-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
             </div>
         </div>
 
-        <!-- Gameplay View -->
-        <div id="view-gameplay" class="absolute inset-0 z-10 hidden flex flex-col">
-            <div class="absolute top-4 right-4 z-20 flex flex-col sm:flex-row items-end sm:items-center gap-2 bg-slate-800/90 backdrop-blur border border-slate-700 p-1.5 rounded-xl shadow-xl">
-                <button id="btn-hint" class="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-lg shadow flex items-center gap-2 text-xs sm:text-sm transition disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+        <!-- Gameplay View (Centered & Fitted) -->
+        <div id="view-gameplay" class="absolute inset-0 z-10 hidden flex flex-col items-center justify-center p-2">
+            
+            <!-- Hint Button overlay -->
+            <div class="absolute top-3 left-3 z-20">
+                <button id="btn-hint" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-xl shadow flex items-center gap-1.5 text-xs transition disabled:opacity-50">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
                     <span>Hint (<span id="hint-count">3</span>)</span>
                 </button>
-                <div class="h-4 w-[1px] bg-slate-700 hidden sm:block"></div>
-                <div class="flex items-center gap-1">
-                    <button id="btn-zoom-in" title="Zoom In" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition">
-                        <i data-lucide="zoom-in" class="w-4 h-4"></i>
-                    </button>
-                    <button id="btn-zoom-out" title="Zoom Out" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition">
-                        <i data-lucide="zoom-out" class="w-4 h-4"></i>
-                    </button>
-                    <button id="btn-zoom-reset" title="Reset View" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition text-xs font-bold px-2.5">
-                        100%
-                    </button>
-                </div>
             </div>
 
-            <div id="viewport-container" class="w-full h-full relative overflow-hidden flex items-center justify-center game-canvas-container">
-                <div id="game-board" class="relative origin-center transition-transform duration-75 ease-out select-none flex items-center justify-center" style="transform: translate(0px, 0px) scale(1);">
-                    <img id="level-image" src="" alt="Level Background" class="max-w-[90vw] max-h-[80vh] object-contain pointer-events-none rounded-lg shadow-2xl block border border-slate-800" draggable="false" />
-                    <!-- Ducks layer is bound precisely over the image container -->
-                    <div id="ducks-layer" class="absolute inset-0 pointer-events-auto"></div>
-                    <div id="radar-signal" class="absolute hidden pointer-events-none -translate-x-1/2 -translate-y-1/2 w-20 h-20">
+            <!-- Perfectly Fitted Image Container -->
+            <div id="viewport-container" class="relative flex items-center justify-center w-full h-full max-w-5xl max-h-[85vh]">
+                <div id="game-board" class="relative flex items-center justify-center">
+                    <img id="level-image" src="" alt="Level Background" class="max-w-full max-h-[82vh] object-contain rounded-xl shadow-2xl border border-slate-800 select-none" draggable="false" />
+                    <!-- Ducks interactive layer matches exact image box dimensions -->
+                    <div id="ducks-layer" class="absolute pointer-events-auto"></div>
+                    <div id="radar-signal" class="absolute hidden pointer-events-none -translate-x-1/2 -translate-y-1/2 w-16 h-16">
                         <div class="w-full h-full rounded-full border-2 border-amber-400 bg-amber-400/20 radar-effect"></div>
                     </div>
                 </div>
@@ -224,21 +200,14 @@
         let timerInterval = null;
         let secondsElapsed = 0;
         
-        let scale = 1;
-        let panX = 0;
-        let panY = 0;
-        let isDragging = false;
-        let dragStartX = 0;
-        let dragStartY = 0;
-
         let bgmMuted = false;
         let sfxMuted = false;
         let audioContext = null;
+        let synthBgmInterval = null;
 
         const DOM = {
             bgmAudio: document.getElementById('bgm-audio'),
             sfxQuack: document.getElementById('sfx-quack'),
-            bgmVolume: document.getElementById('bgm-volume'),
             btnToggleBgm: document.getElementById('btn-toggle-bgm'),
             btnToggleSfx: document.getElementById('btn-toggle-sfx'),
             iconBgm: document.getElementById('icon-bgm'),
@@ -253,16 +222,11 @@
             gameStats: document.getElementById('game-stats'),
             duckCounter: document.getElementById('duck-counter'),
             gameTimer: document.getElementById('game-timer'),
-            viewportContainer: document.getElementById('viewport-container'),
-            gameBoard: document.getElementById('game-board'),
             levelImage: document.getElementById('level-image'),
             ducksLayer: document.getElementById('ducks-layer'),
             radarSignal: document.getElementById('radar-signal'),
             btnHint: document.getElementById('btn-hint'),
             hintCount: document.getElementById('hint-count'),
-            btnZoomIn: document.getElementById('btn-zoom-in'),
-            btnZoomOut: document.getElementById('btn-zoom-out'),
-            btnZoomReset: document.getElementById('btn-zoom-reset'),
             modalWin: document.getElementById('modal-win'),
             winTimeStat: document.getElementById('win-time-stat'),
             winDucksStat: document.getElementById('win-ducks-stat'),
@@ -274,11 +238,11 @@
             lucide.createIcons();
             renderLevelGrid();
             setupEventListeners();
-            setupPanAndZoom();
         });
 
         function setupEventListeners() {
             DOM.btnPlayNow.addEventListener('click', () => {
+                initAudioContext();
                 startBGM();
                 DOM.viewHome.classList.add('hidden');
                 DOM.audioControls.classList.remove('hidden');
@@ -287,15 +251,8 @@
 
             DOM.btnToggleBgm.addEventListener('click', toggleBGM);
             DOM.btnToggleSfx.addEventListener('click', toggleSFX);
-            DOM.bgmVolume.addEventListener('input', (e) => {
-                DOM.bgmAudio.volume = e.target.value;
-            });
-
             DOM.btnBackMenu.addEventListener('click', showLevelSelect);
             DOM.btnHint.addEventListener('click', triggerHint);
-            DOM.btnZoomIn.addEventListener('click', () => adjustZoom(0.25));
-            DOM.btnZoomOut.addEventListener('click', () => adjustZoom(-0.25));
-            DOM.btnZoomReset.addEventListener('click', resetZoomAndPan);
 
             DOM.btnWinReplay.addEventListener('click', () => {
                 DOM.modalWin.classList.add('hidden');
@@ -307,46 +264,49 @@
                 const nextIndex = (currentIndex + 1) % LEVELS_CONFIG.length;
                 startLevel(LEVELS_CONFIG[nextIndex].id);
             });
+
+            window.addEventListener('resize', fitDucksToImage);
         }
 
-        // BGM Play Handler with Web Audio Synth Fallback
-        function startBGM() {
-            if (!bgmMuted) {
-                DOM.bgmAudio.volume = parseFloat(DOM.bgmVolume.value);
-                DOM.bgmAudio.play().catch(err => {
-                    console.warn("BGM file blocked or missing, using upbeat synthesizer stream instead:", err);
-                    playSynthesizedBGM();
-                });
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
             }
         }
 
-        // Web Audio Synthesizer Loop (Guarantees music plays even if the MP3 file fails)
-        let synthBgmInterval = null;
-        function playSynthesizedBGM() {
-            try {
-                if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                if (synthBgmInterval) clearInterval(synthBgmInterval);
-                
-                const notes = [261.63, 329.63, 392.00, 523.25]; // C major upbeat arpeggio
-                let step = 0;
-                
-                synthBgmInterval = setInterval(() => {
-                    if (bgmMuted) return;
+        function startBGM() {
+            if (bgmMuted) return;
+            DOM.bgmAudio.volume = 0.5;
+            DOM.bgmAudio.play().catch(err => {
+                console.warn("MP3 BGM blocked, starting Synth BGM:", err);
+                startSynthBGM();
+            });
+        }
+
+        // Upbeat synthesized duck song melody fallback
+        function startSynthBGM() {
+            if (synthBgmInterval) clearInterval(synthBgmInterval);
+            const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
+            let i = 0;
+            synthBgmInterval = setInterval(() => {
+                if (bgmMuted || !audioContext) return;
+                try {
                     const osc = audioContext.createOscillator();
                     const gain = audioContext.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(notes[step % notes.length], audioContext.currentTime);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(notes[i % notes.length], audioContext.currentTime);
                     gain.gain.setValueAtTime(0.08, audioContext.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.25);
                     osc.connect(gain);
                     gain.connect(audioContext.destination);
                     osc.start();
-                    osc.stop(audioContext.currentTime + 0.3);
-                    step++;
-                }, 350);
-            } catch (e) {
-                console.warn("Synth BGM error:", e);
-            }
+                    osc.stop(audioContext.currentTime + 0.25);
+                    i++;
+                } catch(e) {}
+            }, 300);
         }
 
         function renderLevelGrid() {
@@ -359,25 +319,23 @@
                 card.className = 'bg-slate-800/80 border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl hover:border-amber-400/50 transition duration-300 flex flex-col group cursor-pointer';
                 
                 card.innerHTML = `
-                    <div class="relative h-44 bg-slate-900 overflow-hidden">
+                    <div class="relative h-36 bg-slate-900 overflow-hidden">
                         <img src="${level.image}" alt="${level.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
                              onerror="this.onerror=null; this.src='${level.unsplash}';">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
                         ${isCompleted ? `
-                            <div class="absolute top-3 right-3 bg-emerald-500/95 text-slate-950 font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                            <div class="absolute top-3 right-3 bg-emerald-500 text-slate-950 font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow">
                                 <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Cleared
                             </div>
                         ` : ''}
-                        <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
-                            <div>
-                                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Level ${index + 1}</span>
-                                <h3 class="text-lg font-extrabold text-white leading-tight">${level.title}</h3>
-                            </div>
+                        <div class="absolute bottom-3 left-3 right-3">
+                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Level ${index + 1}</span>
+                            <h3 class="text-base font-extrabold text-white">${level.title}</h3>
                         </div>
                     </div>
-                    <div class="p-4 bg-slate-800 flex justify-between items-center text-xs text-slate-400">
+                    <div class="p-3 bg-slate-800 flex justify-between items-center text-xs text-slate-400">
                         <span>Best: <strong class="text-slate-200 font-mono">${bestTime ? formatTime(parseInt(bestTime)) : '--:--'}</strong></span>
-                        <button class="px-4 py-2 bg-amber-500 group-hover:bg-amber-400 text-slate-950 font-black rounded-xl transition">PLAY</button>
+                        <button class="px-4 py-1.5 bg-amber-500 group-hover:bg-amber-400 text-slate-950 font-black rounded-xl transition">PLAY</button>
                     </div>
                 `;
 
@@ -391,15 +349,15 @@
             currentLevel = LEVELS_CONFIG.find(l => l.id === levelId);
             if (!currentLevel) return;
 
-            const count = Math.floor(Math.random() * 6) + 5; 
+            const count = Math.floor(Math.random() * 4) + 5; // 5 to 8 ducks
             generatedDucks = [];
 
-            // Safe boundary restriction: 12% to 88% ensures ducks are 100% inside the image box
+            // Strict bounds: 15% to 85% to stay completely inside the image box
             for (let i = 0; i < count; i++) {
                 generatedDucks.push({
-                    x: Math.floor(Math.random() * 76) + 12,
-                    y: Math.floor(Math.random() * 72) + 14,
-                    size: Math.floor(Math.random() * 6) + 24
+                    x: Math.floor(Math.random() * 70) + 15,
+                    y: Math.floor(Math.random() * 70) + 15,
+                    size: Math.floor(Math.random() * 6) + 26
                 });
             }
 
@@ -427,22 +385,23 @@
                 }
             };
 
-            // Re-sync duck layer positioning once image dimensions render
             DOM.levelImage.onload = () => {
-                updateDucksLayerSize();
+                fitDucksToImage();
             };
 
             renderDucks();
             startTimer();
-            resetZoomAndPan();
         }
 
-        // Matches the interactive duck layer size precisely to the loaded image bounding box
-        function updateDucksLayerSize() {
-            const imgRect = DOM.levelImage.getBoundingClientRect();
-            const boardRect = DOM.gameBoard.getBoundingClientRect();
-            DOM.ducksLayer.style.width = `${DOM.levelImage.clientWidth}px`;
-            DOM.ducksLayer.style.height = `${DOM.levelImage.clientHeight}px`;
+        // Fits the ducks layer precisely onto the rendered image box on the screen
+        function fitDucksToImage() {
+            setTimeout(() => {
+                const rect = DOM.levelImage.getBoundingClientRect();
+                DOM.ducksLayer.style.width = `${rect.width}px`;
+                DOM.ducksLayer.style.height = `${rect.height}px`;
+                DOM.ducksLayer.style.top = `${DOM.levelImage.offsetTop}px`;
+                DOM.ducksLayer.style.left = `${DOM.levelImage.offsetLeft}px`;
+            }, 50);
         }
 
         function showLevelSelect() {
@@ -456,7 +415,7 @@
 
         function renderDucks() {
             DOM.ducksLayer.innerHTML = '';
-            setTimeout(updateDucksLayerSize, 50);
+            fitDucksToImage();
 
             generatedDucks.forEach((duck, index) => {
                 const duckEl = document.createElement('div');
@@ -467,7 +426,7 @@
                 duckEl.style.height = `${duck.size}px`;
 
                 duckEl.innerHTML = `
-                    <div class="duck-svg-wrapper w-full h-full drop-shadow-md">
+                    <div class="w-full h-full drop-shadow-md">
                         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
                             <path d="M12 36C12 28 20 24 32 24C44 24 54 30 54 40C54 48 44 52 32 52C18 52 12 46 12 36Z" fill="#FACC15"/>
                             <path d="M10 38C10 30 18 26 30 26C38 26 44 28 48 32C42 34 38 40 38 48C24 48 10 46 10 38Z" fill="#EAB308"/>
@@ -516,18 +475,18 @@
 
         function playSyntheticQuack() {
             try {
-                if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                initAudioContext();
                 const osc = audioContext.createOscillator();
                 const gain = audioContext.createGain();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(400, audioContext.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                osc.frequency.setValueAtTime(450, audioContext.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(180, audioContext.currentTime + 0.18);
+                gain.gain.setValueAtTime(0.4, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.18);
                 osc.connect(gain);
                 gain.connect(audioContext.destination);
                 osc.start();
-                osc.stop(audioContext.currentTime + 0.15);
+                osc.stop(audioContext.currentTime + 0.18);
             } catch (e) {}
         }
 
@@ -538,7 +497,7 @@
                 if (synthBgmInterval) clearInterval(synthBgmInterval);
                 DOM.btnToggleBgm.classList.add('opacity-50');
             } else {
-                DOM.bgmAudio.play().catch(() => playSynthesizedBGM());
+                DOM.bgmAudio.play().catch(() => startSynthBGM());
                 DOM.btnToggleBgm.classList.remove('opacity-50');
             }
         }
@@ -562,7 +521,7 @@
             DOM.hintCount.textContent = hintsRemaining;
             if (hintsRemaining <= 0) DOM.btnHint.disabled = true;
 
-            setTimeout(() => DOM.radarSignal.classList.add('hidden'), 3600);
+            setTimeout(() => DOM.radarSignal.classList.add('hidden'), 3500);
         }
 
         function handleWin() {
@@ -572,66 +531,6 @@
             DOM.winDucksStat.textContent = generatedDucks.length.toString();
             DOM.modalWin.classList.remove('hidden');
             if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
-        }
-
-        function setupPanAndZoom() {
-            const container = DOM.viewportContainer;
-
-            container.addEventListener('mousedown', (e) => {
-                if (e.target.closest('#ducks-layer > div')) return;
-                isDragging = true;
-                dragStartX = e.clientX - panX;
-                dragStartY = e.clientY - panY;
-            });
-
-            window.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                panX = e.clientX - dragStartX;
-                panY = e.clientY - dragStartY;
-                updateTransform();
-            });
-
-            window.addEventListener('mouseup', () => isDragging = false);
-
-            container.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1 && !e.target.closest('#ducks-layer > div')) {
-                    isDragging = true;
-                    dragStartX = e.touches[0].clientX - panX;
-                    dragStartY = e.touches[0].clientY - panY;
-                }
-            });
-
-            window.addEventListener('touchmove', (e) => {
-                if (!isDragging || e.touches.length !== 1) return;
-                panX = e.touches[0].clientX - dragStartX;
-                panY = e.touches[0].clientY - dragStartY;
-                updateTransform();
-            });
-
-            window.addEventListener('touchend', () => isDragging = false);
-
-            container.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
-                scale = Math.min(Math.max(scale * zoomFactor, 1), 4);
-                updateTransform();
-            }, { passive: false });
-        }
-
-        function adjustZoom(amount) {
-            scale = Math.min(Math.max(scale + amount, 1), 4);
-            updateTransform();
-        }
-
-        function resetZoomAndPan() {
-            scale = 1;
-            panX = 0;
-            panY = 0;
-            updateTransform();
-        }
-
-        function updateTransform() {
-            DOM.gameBoard.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
         }
 
         function startTimer() {
@@ -651,8 +550,6 @@
             const secs = (totalSecs % 60).toString().padStart(2, '0');
             return `${mins}:${secs}`;
         }
-
-        window.addEventListener('resize', updateDucksLayerSize);
     </script>
 </body>
 </html>
