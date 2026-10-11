@@ -38,25 +38,15 @@
             cursor: grabbing;
         }
 
-        /* Radar hint pulse animation */
         @keyframes radar-pulse {
-            0% {
-                transform: scale(0.3);
-                opacity: 0.9;
-            }
-            50% {
-                opacity: 0.6;
-            }
-            100% {
-                transform: scale(2.5);
-                opacity: 0;
-            }
+            0% { transform: scale(0.3); opacity: 0.9; }
+            50% { opacity: 0.6; }
+            100% { transform: scale(2.5); opacity: 0; }
         }
         .radar-effect {
             animation: radar-pulse 1.8s infinite ease-out;
         }
 
-        /* Found duck pop animation */
         @keyframes duck-pop {
             0% { transform: scale(0.2) rotate(-15deg); opacity: 0; }
             50% { transform: scale(1.3) rotate(10deg); }
@@ -73,7 +63,7 @@
     <audio id="bgm-audio" loop preload="auto" src="theducksong.mp3"></audio>
     <audio id="sfx-quack" preload="auto" src="duck.mp3"></audio>
 
-    <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-4 py-3 flex items-center justify-between z-30 shadow-md shrink-0">
+    <header class="bg-slate-800/95 backdrop-blur border-b border-slate-700 px-4 py-3 flex items-center justify-between z-30 shadow-md shrink-0">
         <div class="flex items-center space-x-3">
             <button id="btn-back-menu" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-slate-200 hidden flex items-center gap-2 text-sm font-semibold">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -84,7 +74,6 @@
             </h1>
         </div>
 
-        <!-- Gameplay Live Stats -->
         <div id="game-stats" class="hidden flex items-center gap-3 sm:gap-6">
             <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700/80">
                 <i data-lucide="target" class="w-4 h-4 text-amber-400"></i>
@@ -97,7 +86,6 @@
             </div>
         </div>
 
-        <!-- Audio Controls -->
         <div class="flex items-center space-x-2">
             <div id="audio-controls" class="hidden flex items-center gap-2 bg-slate-900/60 p-1 rounded-xl border border-slate-700">
                 <button id="btn-toggle-bgm" title="Toggle Background Music" class="p-2 rounded-lg hover:bg-slate-700 transition text-amber-400">
@@ -113,8 +101,9 @@
 
     <main class="flex-1 relative overflow-hidden bg-slate-950 flex flex-col">
 
+        <!-- Home Screen -->
         <div id="view-home" class="absolute inset-0 z-30 bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-            <div class="max-w-md w-full space-y-8 animate-in fade-in zoom-in-95 duration-300">
+            <div class="max-w-md w-full space-y-8">
                 <div class="space-y-3">
                     <div class="text-7xl sm:text-8xl animate-bounce">🦆</div>
                     <h2 class="text-4xl sm:text-5xl font-black text-white tracking-tight">Spot mo duckiess</h2>
@@ -124,37 +113,31 @@
                 </div>
 
                 <div class="space-y-4 pt-4">
-                    <button id="btn-play-now" class="w-full py-4 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xl sm:text-2xl rounded-2xl shadow-2xl hover:shadow-amber-500/20 transform hover:-translate-y-0.5 active:translate-y-0 transition duration-200 flex items-center justify-center gap-3">
+                    <button id="btn-play-now" class="w-full py-4 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xl sm:text-2xl rounded-2xl shadow-2xl transform hover:-translate-y-0.5 active:translate-y-0 transition duration-200 flex items-center justify-center gap-3">
                         <i data-lucide="play" class="w-7 h-7 fill-slate-950"></i> PLAY NOW GRRRR
                     </button>
                 </div>
             </div>
         </div>
 
+        <!-- Level Select View -->
         <div id="view-level-select" class="absolute inset-0 z-20 hidden overflow-y-auto p-4 sm:p-8 flex flex-col items-center">
             <div class="max-w-4xl w-full my-auto space-y-6">
                 <div class="text-center space-y-2">
                     <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Select ikaw lebel</h2>
                 </div>
-
-                <!-- Dynamically Populated Level Cards -->
-                <div id="level-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 pt-2">
-                    <!-- Javascript populates cards -->
-                </div>
+                <div id="level-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 pt-2"></div>
             </div>
         </div>
 
+        <!-- Gameplay View -->
         <div id="view-gameplay" class="absolute inset-0 z-10 hidden flex flex-col">
-            
-            <!-- Zoom & Hint Toolbar -->
             <div class="absolute top-4 right-4 z-20 flex flex-col sm:flex-row items-end sm:items-center gap-2 bg-slate-800/90 backdrop-blur border border-slate-700 p-1.5 rounded-xl shadow-xl">
                 <button id="btn-hint" class="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-lg shadow flex items-center gap-2 text-xs sm:text-sm transition disabled:opacity-50 disabled:cursor-not-allowed">
                     <i data-lucide="sparkles" class="w-4 h-4"></i>
                     <span>Hint (<span id="hint-count">3</span>)</span>
                 </button>
-
                 <div class="h-4 w-[1px] bg-slate-700 hidden sm:block"></div>
-
                 <div class="flex items-center gap-1">
                     <button id="btn-zoom-in" title="Zoom In" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition">
                         <i data-lucide="zoom-in" class="w-4 h-4"></i>
@@ -168,19 +151,10 @@
                 </div>
             </div>
 
-            <!-- Zoom & Pan Canvas Container -->
             <div id="viewport-container" class="w-full h-full relative overflow-hidden flex items-center justify-center game-canvas-container">
                 <div id="game-board" class="relative origin-center transition-transform duration-75 ease-out select-none" style="transform: translate(0px, 0px) scale(1);">
-                    
-                    <!-- Level Image -->
                     <img id="level-image" src="" alt="Level Background" class="max-w-none pointer-events-none rounded-sm shadow-2xl block border border-slate-800" draggable="false" />
-
-                    <!-- Duck Interactive Layer -->
-                    <div id="ducks-layer" class="absolute inset-0 pointer-events-auto">
-                        <!-- Ducks generated here -->
-                    </div>
-
-                    <!-- Radar Hint Overlay -->
+                    <div id="ducks-layer" class="absolute inset-0 pointer-events-auto"></div>
                     <div id="radar-signal" class="absolute hidden pointer-events-none -translate-x-1/2 -translate-y-1/2 w-20 h-20">
                         <div class="w-full h-full rounded-full border-2 border-amber-400 bg-amber-400/20 radar-effect"></div>
                     </div>
@@ -190,15 +164,14 @@
 
     </main>
 
+    <!-- Win Modal -->
     <div id="modal-win" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl space-y-5">
             <div class="text-6xl animate-bounce">🎉</div>
             <div>
                 <h3 class="text-2xl font-black text-white">GOOD JOBB MYYY BEBEEEE</h3>
                 <p class="text-slate-400 text-sm mt-1">NAHANAP MO ALL DUCKIES</p>
             </div>
-
-            <!-- Stats Summary -->
             <div class="grid grid-cols-2 gap-3 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
                 <div>
                     <span class="text-xs text-slate-400 block">Time Taken</span>
@@ -209,8 +182,6 @@
                     <span id="win-ducks-stat" class="text-lg font-bold text-amber-400">0</span>
                 </div>
             </div>
-
-            <!-- Action Buttons -->
             <div class="flex gap-3 pt-2">
                 <button id="btn-win-replay" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Wepway
@@ -223,7 +194,6 @@
     </div>
 
     <script>
-        // SVG Vector Graphic Fallbacks for Instant Playability
         const SVG_FALLBACKS = [
             'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="400" fill="%2338bdf8"/><circle cx="850" cy="100" r="50" fill="%23fde047"/><ellipse cx="200" cy="420" rx="350" ry="150" fill="%234ade80"/><ellipse cx="750" cy="420" rx="400" ry="180" fill="%2315803d"/><rect y="380" width="1000" height="270" fill="%2322c55e"/><ellipse cx="500" cy="520" rx="320" ry="100" fill="%230284c7"/></svg>',
             'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="450" fill="%23fb923c"/><circle cx="500" cy="350" r="180" fill="%23facc15"/><rect y="420" width="1000" height="230" fill="%230284c7"/><path d="M0 450 Q 250 400, 500 450 T 1000 450 L 1000 650 L 0 650 Z" fill="%230369a1"/></svg>',
@@ -231,7 +201,6 @@
             'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="650" fill="%231e1b4b"/><circle cx="200" cy="150" r="40" fill="%23fef08a"/><rect y="500" width="1000" height="150" fill="%23312e81"/></svg>'
         ];
 
-        // High resolution online fallback images
         const UNSPLASH_FALLBACKS = [
             'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
             'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80',
@@ -239,7 +208,7 @@
             'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80'
         ];
 
-        // Level Definitions mapped to 'background/' folder
+        // Configured for 4 levels from background/ folder
         const LEVELS_CONFIG = [
             { id: "level1", title: "Level 1", image: "background/level1.jpg", fallbackImage: "background/level1.png", unsplash: UNSPLASH_FALLBACKS[0], svg: SVG_FALLBACKS[0] },
             { id: "level2", title: "Level 2", image: "background/level2.jpg", fallbackImage: "background/level2.png", unsplash: UNSPLASH_FALLBACKS[1], svg: SVG_FALLBACKS[1] },
@@ -247,7 +216,6 @@
             { id: "level4", title: "Level 4", image: "background/level4.jpg", fallbackImage: "background/level4.png", unsplash: UNSPLASH_FALLBACKS[3], svg: SVG_FALLBACKS[3] }
         ];
 
-        // Active Game State
         let currentLevel = null;
         let generatedDucks = [];
         let foundDucks = new Set();
@@ -255,7 +223,6 @@
         let timerInterval = null;
         let secondsElapsed = 0;
         
-        // Pan and Zoom
         let scale = 1;
         let panX = 0;
         let panY = 0;
@@ -263,12 +230,10 @@
         let dragStartX = 0;
         let dragStartY = 0;
 
-        // Audio Settings
         let bgmMuted = false;
         let sfxMuted = false;
         let audioContext = null;
 
-        // Cache DOM Elements
         const DOM = {
             bgmAudio: document.getElementById('bgm-audio'),
             sfxQuack: document.getElementById('sfx-quack'),
@@ -312,7 +277,6 @@
         });
 
         function setupEventListeners() {
-            // PLAY NOW -> Direct level start
             DOM.btnPlayNow.addEventListener('click', () => {
                 startBGM();
                 DOM.viewHome.classList.add('hidden');
@@ -320,23 +284,18 @@
                 startLevel(LEVELS_CONFIG[0].id);
             });
 
-            // Audio Controls
             DOM.btnToggleBgm.addEventListener('click', toggleBGM);
             DOM.btnToggleSfx.addEventListener('click', toggleSFX);
             DOM.bgmVolume.addEventListener('input', (e) => {
                 DOM.bgmAudio.volume = e.target.value;
             });
 
-            // Navigation
             DOM.btnBackMenu.addEventListener('click', showLevelSelect);
-
-            // Gameplay Controls
             DOM.btnHint.addEventListener('click', triggerHint);
             DOM.btnZoomIn.addEventListener('click', () => adjustZoom(0.25));
             DOM.btnZoomOut.addEventListener('click', () => adjustZoom(-0.25));
             DOM.btnZoomReset.addEventListener('click', resetZoomAndPan);
 
-            // Win Modal Actions
             DOM.btnWinReplay.addEventListener('click', () => {
                 DOM.modalWin.classList.add('hidden');
                 startLevel(currentLevel.id);
@@ -349,19 +308,17 @@
             });
         }
 
-        // Background Music Handler
         function startBGM() {
             if (!bgmMuted) {
                 DOM.bgmAudio.volume = parseFloat(DOM.bgmVolume.value);
                 DOM.bgmAudio.play().catch(err => {
-                    console.warn("Background music play prevented:", err);
+                    console.warn("Background music play prevented by browser policy:", err);
                 });
             }
         }
 
         function renderLevelGrid() {
             DOM.levelGrid.innerHTML = '';
-            
             LEVELS_CONFIG.forEach((level, index) => {
                 const bestTime = localStorage.getItem(`spot_duck_best_${level.id}`);
                 const isCompleted = localStorage.getItem(`spot_duck_completed_${level.id}`) === 'true';
@@ -372,10 +329,10 @@
                 card.innerHTML = `
                     <div class="relative h-44 bg-slate-900 overflow-hidden">
                         <img src="${level.image}" alt="${level.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
-                             onerror="this.onerror=null; this.src='${level.unsplash}'; this.onerror=function(){ this.src='${level.svg}'; };">
+                             onerror="this.onerror=null; this.src='${level.unsplash}';">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
                         ${isCompleted ? `
-                            <div class="absolute top-3 right-3 bg-emerald-500/90 backdrop-blur text-slate-950 font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                            <div class="absolute top-3 right-3 bg-emerald-500/95 text-slate-950 font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
                                 <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Cleared
                             </div>
                         ` : ''}
@@ -387,17 +344,14 @@
                         </div>
                     </div>
                     <div class="p-4 bg-slate-800 flex justify-between items-center text-xs text-slate-400">
-                        <span>Best Time: <strong class="text-slate-200 font-mono">${bestTime ? formatTime(parseInt(bestTime)) : '--:--'}</strong></span>
-                        <button class="px-4 py-2 bg-amber-500 group-hover:bg-amber-400 text-slate-950 font-black rounded-xl transition">
-                            PLAY
-                        </button>
+                        <span>Best: <strong class="text-slate-200 font-mono">${bestTime ? formatTime(parseInt(bestTime)) : '--:--'}</strong></span>
+                        <button class="px-4 py-2 bg-amber-500 group-hover:bg-amber-400 text-slate-950 font-black rounded-xl transition">PLAY</button>
                     </div>
                 `;
 
                 card.addEventListener('click', () => startLevel(level.id));
                 DOM.levelGrid.appendChild(card);
             });
-            
             lucide.createIcons();
         }
 
@@ -405,7 +359,6 @@
             currentLevel = LEVELS_CONFIG.find(l => l.id === levelId);
             if (!currentLevel) return;
 
-            // Generate Random Ducks (between 5 and 10)
             const count = Math.floor(Math.random() * 6) + 5; 
             generatedDucks = [];
 
@@ -421,18 +374,15 @@
             hintsRemaining = 3;
             secondsElapsed = 0;
 
-            // Update UI Counters
             DOM.duckCounter.textContent = `0 / ${generatedDucks.length}`;
             DOM.hintCount.textContent = hintsRemaining;
             DOM.btnHint.disabled = false;
 
-            // Switch Views
             DOM.viewLevelSelect.classList.add('hidden');
             DOM.viewGameplay.classList.remove('hidden');
             DOM.btnBackMenu.classList.remove('hidden');
             DOM.gameStats.classList.remove('hidden');
 
-            // Load Image with Cascading Fallbacks
             DOM.levelImage.src = currentLevel.image;
             DOM.levelImage.onerror = () => {
                 if (DOM.levelImage.src.includes('.jpg')) {
@@ -442,10 +392,6 @@
                 } else {
                     DOM.levelImage.src = currentLevel.svg;
                 }
-            };
-
-            DOM.levelImage.onload = () => {
-                resetZoomAndPan();
             };
 
             renderDucks();
@@ -464,17 +410,14 @@
 
         function renderDucks() {
             DOM.ducksLayer.innerHTML = '';
-
             generatedDucks.forEach((duck, index) => {
                 const duckEl = document.createElement('div');
-
                 duckEl.className = 'absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform duration-200 hover:scale-125';
                 duckEl.style.left = `${duck.x}%`;
                 duckEl.style.top = `${duck.y}%`;
                 duckEl.style.width = `${duck.size}px`;
                 duckEl.style.height = `${duck.size}px`;
 
-                // Rubber Duck Graphic
                 duckEl.innerHTML = `
                     <div class="duck-svg-wrapper w-full h-full drop-shadow-md">
                         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
@@ -483,8 +426,6 @@
                             <circle cx="44" cy="20" r="12" fill="#FACC15"/>
                             <path d="M52 20C52 20 62 21 60 25C58 29 50 26 50 26Z" fill="#F97316"/>
                             <circle cx="46" cy="18" r="2.5" fill="#0F172A"/>
-                            <circle cx="47" cy="17" r="1" fill="#FFFFFF"/>
-                            <path d="M22 36C22 32 28 32 32 36C34 40 28 44 22 40C20 38 20 37 22 40C20 38 20 37 22 40C20 38 20 37 22 36Z" fill="#CA8A04"/>
                         </svg>
                     </div>
                 `;
@@ -500,7 +441,6 @@
 
         function onDuckClicked(index, element) {
             if (foundDucks.has(index)) return;
-
             foundDucks.add(index);
             playQuackSFX();
 
@@ -515,126 +455,74 @@
             `;
 
             DOM.duckCounter.textContent = `${foundDucks.size} / ${generatedDucks.length}`;
-
             if (foundDucks.size === generatedDucks.length) {
                 setTimeout(handleWin, 500);
             }
         }
 
-        // SFX Player with Web Audio API Synthesizer Fallback
         function playQuackSFX() {
             if (sfxMuted) return;
-
             DOM.sfxQuack.currentTime = 0;
-            const playPromise = DOM.sfxQuack.play();
-
-            if (playPromise !== undefined) {
-                playPromise.catch(() => {
-                    playSyntheticQuack();
-                });
-            }
+            DOM.sfxQuack.play().catch(() => playSyntheticQuack());
         }
 
         function playSyntheticQuack() {
             try {
-                if (!audioContext) {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                }
+                if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioContext.createOscillator();
                 const gain = audioContext.createGain();
-                
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(400, audioContext.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.15);
-                
                 gain.gain.setValueAtTime(0.3, audioContext.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-                
                 osc.connect(gain);
                 gain.connect(audioContext.destination);
-                
                 osc.start();
                 osc.stop(audioContext.currentTime + 0.15);
-            } catch (e) {
-                console.warn("Synth quack error:", e);
-            }
+            } catch (e) {}
         }
 
-        // Toggle Audio Settings
         function toggleBGM() {
             bgmMuted = !bgmMuted;
             if (bgmMuted) {
                 DOM.bgmAudio.pause();
                 DOM.btnToggleBgm.classList.add('opacity-50');
-                DOM.iconBgm.setAttribute('data-lucide', 'music-2');
             } else {
                 DOM.bgmAudio.play().catch(() => {});
                 DOM.btnToggleBgm.classList.remove('opacity-50');
-                DOM.iconBgm.setAttribute('data-lucide', 'music');
             }
-            lucide.createIcons();
         }
 
         function toggleSFX() {
             sfxMuted = !sfxMuted;
-            if (sfxMuted) {
-                DOM.btnToggleSfx.classList.add('opacity-50');
-                DOM.iconSfx.setAttribute('data-lucide', 'volume-x');
-            } else {
-                DOM.btnToggleSfx.classList.remove('opacity-50');
-                DOM.iconSfx.setAttribute('data-lucide', 'volume-2');
-            }
-            lucide.createIcons();
+            DOM.btnToggleSfx.classList.toggle('opacity-50', sfxMuted);
         }
 
         function triggerHint() {
             if (hintsRemaining <= 0) return;
+            const unfound = generatedDucks.map((_, i) => i).filter(i => !foundDucks.has(i));
+            if (unfound.length === 0) return;
 
-            const unfoundIndices = generatedDucks
-                .map((_, idx) => idx)
-                .filter(idx => !foundDucks.has(idx));
-
-            if (unfoundIndices.length === 0) return;
-
-            const targetIndex = unfoundIndices[Math.floor(Math.random() * unfoundIndices.length)];
-            const targetDuck = generatedDucks[targetIndex];
-
-            DOM.radarSignal.style.left = `${targetDuck.x}%`;
-            DOM.radarSignal.style.top = `${targetDuck.y}%`;
+            const target = generatedDucks[unfound[Math.floor(Math.random() * unfound.length)]];
+            DOM.radarSignal.style.left = `${target.x}%`;
+            DOM.radarSignal.style.top = `${target.y}%`;
             DOM.radarSignal.classList.remove('hidden');
 
             hintsRemaining--;
             DOM.hintCount.textContent = hintsRemaining;
-            if (hintsRemaining <= 0) {
-                DOM.btnHint.disabled = true;
-            }
+            if (hintsRemaining <= 0) DOM.btnHint.disabled = true;
 
-            setTimeout(() => {
-                DOM.radarSignal.classList.add('hidden');
-            }, 3600);
+            setTimeout(() => DOM.radarSignal.classList.add('hidden'), 3600);
         }
 
         function handleWin() {
             stopTimer();
-
-            const levelKey = `spot_duck_best_${currentLevel.id}`;
-            const existingBest = localStorage.getItem(levelKey);
-            if (!existingBest || secondsElapsed < parseInt(existingBest)) {
-                localStorage.setItem(levelKey, secondsElapsed.toString());
-            }
             localStorage.setItem(`spot_duck_completed_${currentLevel.id}`, 'true');
-
             DOM.winTimeStat.textContent = formatTime(secondsElapsed);
             DOM.winDucksStat.textContent = generatedDucks.length.toString();
             DOM.modalWin.classList.remove('hidden');
-
-            if (typeof confetti === 'function') {
-                confetti({
-                    particleCount: 120,
-                    spread: 80,
-                    origin: { y: 0.6 }
-                });
-            }
+            if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
         }
 
         function setupPanAndZoom() {
@@ -654,40 +542,18 @@
                 updateTransform();
             });
 
-            window.addEventListener('mouseup', () => {
-                isDragging = false;
-            });
-
-            container.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    isDragging = true;
-                    dragStartX = e.touches[0].clientX - panX;
-                    dragStartY = e.touches[0].clientY - panY;
-                }
-            }, { passive: true });
-
-            container.addEventListener('touchmove', (e) => {
-                if (isDragging && e.touches.length === 1) {
-                    panX = e.touches[0].clientX - dragStartX;
-                    panY = e.touches[0].clientY - dragStartY;
-                    updateTransform();
-                }
-            }, { passive: true });
-
-            container.addEventListener('touchend', () => {
-                isDragging = false;
-            });
+            window.addEventListener('mouseup', () => isDragging = false);
 
             container.addEventListener('wheel', (e) => {
                 e.preventDefault();
-                const delta = e.deltaY < 0 ? 0.15 : -0.15;
-                adjustZoom(delta);
+                const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+                scale = Math.min(Math.max(scale * zoomFactor, 1), 4);
+                updateTransform();
             }, { passive: false });
         }
 
-        function adjustZoom(delta) {
-            scale = Math.min(Math.max(0.8, scale + delta), 3.5);
-            DOM.btnZoomReset.textContent = `${Math.round(scale * 100)}%`;
+        function adjustZoom(amount) {
+            scale = Math.min(Math.max(scale + amount, 1), 4);
             updateTransform();
         }
 
@@ -695,7 +561,6 @@
             scale = 1;
             panX = 0;
             panY = 0;
-            DOM.btnZoomReset.textContent = '100%';
             updateTransform();
         }
 
@@ -703,11 +568,8 @@
             DOM.gameBoard.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
         }
 
-        // Timer Helpers
         function startTimer() {
             stopTimer();
-            secondsElapsed = 0;
-            DOM.gameTimer.textContent = '00:00';
             timerInterval = setInterval(() => {
                 secondsElapsed++;
                 DOM.gameTimer.textContent = formatTime(secondsElapsed);
@@ -718,9 +580,9 @@
             if (timerInterval) clearInterval(timerInterval);
         }
 
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const secs = (seconds % 60).toString().padStart(2, '0');
+        function formatTime(totalSecs) {
+            const mins = Math.floor(totalSecs / 60).toString().padStart(2, '0');
+            const secs = (totalSecs % 60).toString().padStart(2, '0');
             return `${mins}:${secs}`;
         }
     </script>
