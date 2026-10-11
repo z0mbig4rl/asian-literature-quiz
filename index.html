@@ -10,6 +10,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Canvas Confetti CDN -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -21,8 +23,14 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden;
             background-color: #020617;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Lock scrolling during active gameplay */
+        body.game-active {
+            overflow: hidden;
         }
 
         @keyframes radar-pulse {
@@ -44,12 +52,17 @@
         }
     </style>
 </head>
-<body class="flex flex-col font-sans overflow-hidden antialiased select-none bg-slate-950">
+<body class="flex flex-col font-sans antialiased select-none bg-slate-950 min-h-full">
 
-    <!-- Sound Effect Player -->
+    <!-- Standard Quack & Easter Duck Audio Elements -->
     <audio id="sfx-quack" preload="auto" src="duck.mp3"></audio>
+    <audio id="sfx-easter1" preload="auto" src="easterduck1.mp3"></audio>
+    <audio id="sfx-easter2" preload="auto" src="easterduck2.mp3"></audio>
+    <audio id="sfx-easter3" preload="auto" src="easterduck3.mp3"></audio>
+    <audio id="sfx-easter4" preload="auto" src="easterduck4.mp3"></audio>
+    <audio id="sfx-easter5" preload="auto" src="easterduck5.mp3"></audio>
 
-    <header class="bg-slate-800/95 border-b border-slate-700 px-3 py-2 flex items-center justify-between z-30 shadow-md shrink-0">
+    <header class="bg-slate-800/95 border-b border-slate-700 px-3 py-2 flex items-center justify-between z-30 shadow-md shrink-0 sticky top-0">
         <div class="flex items-center space-x-2">
             <button id="btn-back-menu" class="p-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-slate-200 hidden flex items-center gap-1 text-xs font-semibold">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -72,59 +85,67 @@
         </div>
 
         <div>
-            <button id="btn-toggle-sfx" title="Toggle Sound Effects" class="p-1.5 rounded-lg bg-slate-700 text-emerald-400 hover:bg-slate-600 transition">
-                <i id="icon-sfx" data-lucide="volume-2" class="w-4 h-4"></i>
+            <!-- Volume button controls YouTube Music Mute/Unmute -->
+            <button id="btn-toggle-music" title="Toggle YouTube Music" class="p-1.5 rounded-lg bg-slate-700 text-amber-400 hover:bg-slate-600 transition flex items-center gap-1 px-2 text-xs font-bold">
+                <i id="icon-music" data-lucide="volume-2" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Music</span>
             </button>
         </div>
     </header>
 
-    <main class="flex-1 relative overflow-hidden bg-slate-950 flex flex-col items-center justify-center p-2">
+    <main class="flex-1 relative bg-slate-950 flex flex-col items-center justify-center p-2 min-h-[calc(100vh-50px)]">
 
         <!-- Home Screen -->
         <div id="view-home" class="absolute inset-0 z-30 bg-slate-950 flex flex-col items-center justify-center p-4 text-center">
-            <div class="max-w-md w-full space-y-6">
-                <div class="space-y-2">
-                    <div class="text-6xl sm:text-7xl animate-bounce">🦆</div>
-                    <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">Spot mo duckiess</h2>
-                    <p class="text-slate-400 text-xs sm:text-sm">Hanap hanappp ikaww duckiess hereee</p>
+            <div class="max-w-md w-full space-y-4">
+                <div class="space-y-1">
+                    <div class="text-5xl sm:text-6xl animate-bounce">🦆</div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Spot mo duckiess</h2>
+                    <p class="text-slate-400 text-xs">Hanap hanappp ikaww duckiess hereee</p>
                 </div>
 
-                <!-- Embedded Duck Song Player for Android/PC -->
-                <div class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 shadow-lg">
-                    <p class="text-xs text-amber-400 font-bold mb-1">DUCK SONGG PWAY PWAY</p>
+                <!-- YouTube Video Container with Manual Controls -->
+                <div class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 shadow-lg space-y-2">
+                    <p class="text-[11px] text-amber-400 font-bold">🎵 The Duck Song</p>
                     <div class="relative w-full overflow-hidden rounded-lg aspect-video">
-                        <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/9Ws0Sq-96dY" title="The Duck Song" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div id="youtube-player"></div>
+                    </div>
+                    <!-- Play / Pause Buttons -->
+                    <div class="flex gap-2">
+                        <button id="btn-yt-play" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1 transition">
+                            <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Play Song
+                        </button>
+                        <button id="btn-yt-pause" class="flex-1 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1 transition">
+                            <i data-lucide="pause" class="w-3.5 h-3.5 fill-current"></i> Pause Song
+                        </button>
                     </div>
                 </div>
 
-                <button id="btn-play-now" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 font-black text-lg sm:text-xl rounded-2xl shadow-xl active:scale-95 transition duration-200 flex items-center justify-center gap-2">
-                    <i data-lucide="play" class="w-6 h-6 fill-slate-950"></i> PLAY NOW GRRRR
+                <button id="btn-play-now" class="w-full py-3 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 font-black text-lg rounded-2xl shadow-xl active:scale-95 transition duration-200 flex items-center justify-center gap-2">
+                    <i data-lucide="play" class="w-5 h-5 fill-slate-950"></i> PLAY NOW GRRRR
                 </button>
             </div>
         </div>
 
         <!-- Level Select View -->
         <div id="view-level-select" class="absolute inset-0 z-20 hidden overflow-y-auto p-4 flex flex-col items-center justify-center">
-            <div class="max-w-md w-full space-y-3">
+            <div class="max-w-md w-full space-y-3 my-auto py-6">
                 <h2 class="text-2xl font-extrabold text-white text-center">Select ikaw lebel</h2>
                 <div id="level-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
             </div>
         </div>
 
-        <!-- Gameplay View (Strictly Fitted & Centered) -->
+        <!-- Gameplay View -->
         <div id="view-gameplay" class="absolute inset-0 z-10 hidden flex flex-col items-center justify-center">
-            
             <div class="absolute top-2 left-2 z-20">
                 <button id="btn-hint" class="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg shadow flex items-center gap-1 text-xs">
                     <i data-lucide="sparkles" class="w-3 h-3"></i> Hint (<span id="hint-count">3</span>)
                 </button>
             </div>
 
-            <!-- Fitted Screen Wrapper -->
             <div class="relative flex items-center justify-center w-full h-full p-2">
                 <div id="game-board" class="relative flex items-center justify-center max-w-[95vw] max-h-[75vh]">
                     <img id="level-image" src="" alt="Level Background" class="max-w-[95vw] max-h-[72vh] object-contain rounded-xl shadow-2xl border border-slate-800" draggable="false" />
-                    <!-- Ducks layer perfectly mapped over the image boundaries -->
                     <div id="ducks-layer" class="absolute pointer-events-auto"></div>
                     <div id="radar-signal" class="absolute hidden pointer-events-none -translate-x-1/2 -translate-y-1/2 w-14 h-14">
                         <div class="w-full h-full rounded-full border-2 border-amber-400 bg-amber-400/20 radar-effect"></div>
@@ -161,6 +182,18 @@
     </div>
 
     <script>
+        let ytPlayer;
+        let isMusicMuted = false;
+
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtube-player', {
+                height: '100%',
+                width: '100%',
+                videoId: '9Ws0Sq-96dY',
+                playerVars: { 'playsinline': 1, 'autoplay': 0 }
+            });
+        }
+
         const SVG_FALLBACKS = [
             'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"><rect width="800" height="300" fill="%2338bdf8"/><circle cx="700" cy="80" r="40" fill="%23fde047"/><ellipse cx="150" cy="320" rx="250" ry="120" fill="%234ade80"/><ellipse cx="650" cy="320" rx="300" ry="140" fill="%2315803d"/><rect y="280" width="800" height="220" fill="%2322c55e"/></svg>',
             'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"><rect width="800" height="350" fill="%23fb923c"/><circle cx="400" cy="250" r="140" fill="%23facc15"/><rect y="320" width="800" height="180" fill="%230284c7"/></svg>',
@@ -188,12 +221,20 @@
         let hintsRemaining = 3;
         let timerInterval = null;
         let secondsElapsed = 0;
-        let sfxMuted = false;
 
         const DOM = {
             sfxQuack: document.getElementById('sfx-quack'),
-            btnToggleSfx: document.getElementById('btn-toggle-sfx'),
-            iconSfx: document.getElementById('icon-sfx'),
+            easterAudios: [
+                document.getElementById('sfx-easter1'),
+                document.getElementById('sfx-easter2'),
+                document.getElementById('sfx-easter3'),
+                document.getElementById('sfx-easter4'),
+                document.getElementById('sfx-easter5')
+            ],
+            btnYtPlay: document.getElementById('btn-yt-play'),
+            btnYtPause: document.getElementById('btn-yt-pause'),
+            btnToggleMusic: document.getElementById('btn-toggle-music'),
+            iconMusic: document.getElementById('icon-music'),
             viewHome: document.getElementById('view-home'),
             viewLevelSelect: document.getElementById('view-level-select'),
             viewGameplay: document.getElementById('view-gameplay'),
@@ -222,12 +263,23 @@
         });
 
         function setupEventListeners() {
+            DOM.btnYtPlay.addEventListener('click', () => {
+                if (ytPlayer && typeof ytPlayer.playVideo === 'function') ytPlayer.playVideo();
+            });
+            DOM.btnYtPause.addEventListener('click', () => {
+                if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
+            });
+
             DOM.btnPlayNow.addEventListener('click', () => {
+                if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+                    ytPlayer.pauseVideo();
+                }
+                document.body.classList.add('game-active');
                 DOM.viewHome.classList.add('hidden');
                 startLevel(LEVELS_CONFIG[0].id);
             });
 
-            DOM.btnToggleSfx.addEventListener('click', toggleSFX);
+            DOM.btnToggleMusic.addEventListener('click', toggleYouTubeMusic);
             DOM.btnBackMenu.addEventListener('click', showLevelSelect);
             DOM.btnHint.addEventListener('click', triggerHint);
 
@@ -243,6 +295,21 @@
             });
 
             window.addEventListener('resize', fitDucksToImage);
+        }
+
+        function toggleYouTubeMusic() {
+            if (!ytPlayer || typeof ytPlayer.mute !== 'function') return;
+            isMusicMuted = !isMusicMuted;
+            if (isMusicMuted) {
+                ytPlayer.mute();
+                DOM.btnToggleMusic.classList.add('opacity-50');
+                DOM.iconMusic.setAttribute('data-lucide', 'volume-x');
+            } else {
+                ytPlayer.unMute();
+                DOM.btnToggleMusic.classList.remove('opacity-50');
+                DOM.iconMusic.setAttribute('data-lucide', 'volume-2');
+            }
+            lucide.createIcons();
         }
 
         function renderLevelGrid() {
@@ -285,10 +352,9 @@
             currentLevel = LEVELS_CONFIG.find(l => l.id === levelId);
             if (!currentLevel) return;
 
-            const count = Math.floor(Math.random() * 3) + 5; // 5 to 7 ducks
+            const count = Math.floor(Math.random() * 3) + 5; 
             generatedDucks = [];
 
-            // Safe boundary restriction: 20% to 80% ensures ducks stay 100% inside the image box
             for (let i = 0; i < count; i++) {
                 generatedDucks.push({
                     x: Math.floor(Math.random() * 60) + 20,
@@ -341,6 +407,7 @@
 
         function showLevelSelect() {
             stopTimer();
+            document.body.classList.remove('game-active');
             DOM.viewGameplay.classList.add('hidden');
             DOM.viewLevelSelect.classList.remove('hidden');
             DOM.btnBackMenu.classList.add('hidden');
@@ -384,7 +451,8 @@
         function onDuckClicked(index, element) {
             if (foundDucks.has(index)) return;
             foundDucks.add(index);
-            playQuackSFX();
+            
+            playDuckSoundWithMusicInterruption();
 
             element.classList.add('duck-found-anim');
             element.innerHTML = `
@@ -402,15 +470,30 @@
             }
         }
 
-        function playQuackSFX() {
-            if (sfxMuted) return;
-            DOM.sfxQuack.currentTime = 0;
-            DOM.sfxQuack.play().catch(() => {});
-        }
+        // 20% Chance Easter Duck Logic with Audio Interruption
+        function playDuckSoundWithMusicInterruption() {
+            let soundToPlay;
+            let isEaster = Math.random() < 0.20; 
 
-        function toggleSFX() {
-            sfxMuted = !sfxMuted;
-            DOM.btnToggleSfx.classList.toggle('opacity-50', sfxMuted);
+            if (isEaster) {
+                const randomEaster = DOM.easterAudios[Math.floor(Math.random() * DOM.easterAudios.length)];
+                soundToPlay = randomEaster;
+            } else {
+                soundToPlay = DOM.sfxQuack;
+            }
+
+            if (ytPlayer && typeof ytPlayer.mute === 'function' && !isMusicMuted) {
+                ytPlayer.mute();
+            }
+
+            soundToPlay.currentTime = 0;
+            soundToPlay.play().catch(() => {});
+
+            soundToPlay.onended = () => {
+                if (ytPlayer && typeof ytPlayer.unMute === 'function' && !isMusicMuted) {
+                    ytPlayer.unMute();
+                }
+            };
         }
 
         function triggerHint() {
