@@ -15,12 +15,12 @@
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-            -webkit-touch-callout: none;
         }
-        body {
-            position: fixed;
-            width: 100vw;
-            height: 100vh;
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
             background-color: #020617;
         }
@@ -44,96 +44,89 @@
         }
     </style>
 </head>
-<body class="h-full flex flex-col font-sans overflow-hidden antialiased select-none bg-slate-950">
+<body class="flex flex-col font-sans overflow-hidden antialiased select-none bg-slate-950">
 
-    <!-- Audio Player Elements -->
-    <audio id="bgm-audio" loop preload="auto" src="theducksong.mp3"></audio>
+    <!-- Sound Effect Player -->
     <audio id="sfx-quack" preload="auto" src="duck.mp3"></audio>
 
-    <header class="bg-slate-800/95 backdrop-blur border-b border-slate-700 px-4 py-2.5 flex items-center justify-between z-30 shadow-md shrink-0">
-        <div class="flex items-center space-x-3">
-            <button id="btn-back-menu" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-slate-200 hidden flex items-center gap-2 text-sm font-semibold">
+    <header class="bg-slate-800/95 border-b border-slate-700 px-3 py-2 flex items-center justify-between z-30 shadow-md shrink-0">
+        <div class="flex items-center space-x-2">
+            <button id="btn-back-menu" class="p-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-slate-200 hidden flex items-center gap-1 text-xs font-semibold">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                <span class="hidden sm:inline">Level Menu</span>
+                <span>Menu</span>
             </button>
-            <h1 class="text-lg sm:text-2xl font-black tracking-tight text-amber-400 flex items-center gap-2">
+            <h1 class="text-base sm:text-xl font-black tracking-tight text-amber-400 flex items-center gap-1.5">
                 <span>🦆</span> SPOT THE DUCKIES
             </h1>
         </div>
 
-        <div id="game-stats" class="hidden flex items-center gap-2 sm:gap-4">
-            <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded-full border border-slate-700/80">
-                <i data-lucide="target" class="w-3.5 h-3.5 text-amber-400"></i>
-                <span class="text-xs font-semibold text-slate-300">Found:</span>
-                <span id="duck-counter" class="text-xs sm:text-sm font-bold text-amber-400">0 / 0</span>
+        <div id="game-stats" class="hidden flex items-center gap-2">
+            <div class="flex items-center gap-1 bg-slate-900/80 px-2 py-1 rounded-full border border-slate-700">
+                <i data-lucide="target" class="w-3 h-3 text-amber-400"></i>
+                <span id="duck-counter" class="text-xs font-bold text-amber-400">0 / 0</span>
             </div>
-            <div class="flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-1 rounded-full border border-slate-700/80">
-                <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-400"></i>
-                <span id="game-timer" class="text-xs sm:text-sm font-mono font-bold text-cyan-400">00:00</span>
+            <div class="flex items-center gap-1 bg-slate-900/80 px-2 py-1 rounded-full border border-slate-700">
+                <i data-lucide="clock" class="w-3 h-3 text-cyan-400"></i>
+                <span id="game-timer" class="text-xs font-mono font-bold text-cyan-400">00:00</span>
             </div>
         </div>
 
-        <div class="flex items-center space-x-2">
-            <div id="audio-controls" class="hidden flex items-center gap-2 bg-slate-900/60 p-1 rounded-xl border border-slate-700">
-                <button id="btn-toggle-bgm" title="Toggle Background Music" class="p-1.5 rounded-lg hover:bg-slate-700 transition text-amber-400">
-                    <i id="icon-bgm" data-lucide="music" class="w-4 h-4"></i>
-                </button>
-                <button id="btn-toggle-sfx" title="Toggle Sound Effects" class="p-1.5 rounded-lg hover:bg-slate-700 transition text-emerald-400">
-                    <i id="icon-sfx" data-lucide="volume-2" class="w-4 h-4"></i>
-                </button>
-            </div>
+        <div>
+            <button id="btn-toggle-sfx" title="Toggle Sound Effects" class="p-1.5 rounded-lg bg-slate-700 text-emerald-400 hover:bg-slate-600 transition">
+                <i id="icon-sfx" data-lucide="volume-2" class="w-4 h-4"></i>
+            </button>
         </div>
     </header>
 
-    <main class="flex-1 relative overflow-hidden bg-slate-950 flex flex-col items-center justify-center">
+    <main class="flex-1 relative overflow-hidden bg-slate-950 flex flex-col items-center justify-center p-2">
 
         <!-- Home Screen -->
-        <div id="view-home" class="absolute inset-0 z-30 bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-            <div class="max-w-md w-full space-y-8">
-                <div class="space-y-3">
-                    <div class="text-7xl sm:text-8xl animate-bounce">🦆</div>
-                    <h2 class="text-4xl sm:text-5xl font-black text-white tracking-tight">Spot mo duckiess</h2>
-                    <p class="text-slate-400 text-sm sm:text-base">
-                        Hanap hanappp ikaww duckiess hereee
-                    </p>
+        <div id="view-home" class="absolute inset-0 z-30 bg-slate-950 flex flex-col items-center justify-center p-4 text-center">
+            <div class="max-w-md w-full space-y-6">
+                <div class="space-y-2">
+                    <div class="text-6xl sm:text-7xl animate-bounce">🦆</div>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">Spot mo duckiess</h2>
+                    <p class="text-slate-400 text-xs sm:text-sm">Hanap hanappp ikaww duckiess hereee</p>
                 </div>
 
-                <div class="space-y-4 pt-4">
-                    <button id="btn-play-now" class="w-full py-4 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xl sm:text-2xl rounded-2xl shadow-2xl transform active:scale-95 transition duration-200 flex items-center justify-center gap-3">
-                        <i data-lucide="play" class="w-7 h-7 fill-slate-950"></i> PLAY NOW GRRRR
-                    </button>
+                <!-- Embedded Duck Song Player for Android/PC -->
+                <div class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 shadow-lg">
+                    <p class="text-xs text-amber-400 font-bold mb-1">DUCK SONGG PWAY PWAY</p>
+                    <div class="relative w-full overflow-hidden rounded-lg aspect-video">
+                        <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/9Ws0Sq-96dY" title="The Duck Song" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
                 </div>
+
+                <button id="btn-play-now" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 font-black text-lg sm:text-xl rounded-2xl shadow-xl active:scale-95 transition duration-200 flex items-center justify-center gap-2">
+                    <i data-lucide="play" class="w-6 h-6 fill-slate-950"></i> PLAY NOW GRRRR
+                </button>
             </div>
         </div>
 
         <!-- Level Select View -->
         <div id="view-level-select" class="absolute inset-0 z-20 hidden overflow-y-auto p-4 flex flex-col items-center justify-center">
-            <div class="max-w-xl w-full space-y-4">
-                <div class="text-center space-y-1">
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Select ikaw lebel</h2>
-                </div>
-                <div id="level-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            <div class="max-w-md w-full space-y-3">
+                <h2 class="text-2xl font-extrabold text-white text-center">Select ikaw lebel</h2>
+                <div id="level-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
             </div>
         </div>
 
-        <!-- Gameplay View (Centered & Fitted) -->
-        <div id="view-gameplay" class="absolute inset-0 z-10 hidden flex flex-col items-center justify-center p-2">
+        <!-- Gameplay View (Strictly Fitted & Centered) -->
+        <div id="view-gameplay" class="absolute inset-0 z-10 hidden flex flex-col items-center justify-center">
             
-            <!-- Hint Button overlay -->
-            <div class="absolute top-3 left-3 z-20">
-                <button id="btn-hint" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-xl shadow flex items-center gap-1.5 text-xs transition disabled:opacity-50">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                    <span>Hint (<span id="hint-count">3</span>)</span>
+            <div class="absolute top-2 left-2 z-20">
+                <button id="btn-hint" class="px-2.5 py-1 bg-amber-500 text-slate-950 font-bold rounded-lg shadow flex items-center gap-1 text-xs">
+                    <i data-lucide="sparkles" class="w-3 h-3"></i> Hint (<span id="hint-count">3</span>)
                 </button>
             </div>
 
-            <!-- Perfectly Fitted Image Container -->
-            <div id="viewport-container" class="relative flex items-center justify-center w-full h-full max-w-5xl max-h-[85vh]">
-                <div id="game-board" class="relative flex items-center justify-center">
-                    <img id="level-image" src="" alt="Level Background" class="max-w-full max-h-[82vh] object-contain rounded-xl shadow-2xl border border-slate-800 select-none" draggable="false" />
-                    <!-- Ducks interactive layer matches exact image box dimensions -->
+            <!-- Fitted Screen Wrapper -->
+            <div class="relative flex items-center justify-center w-full h-full p-2">
+                <div id="game-board" class="relative flex items-center justify-center max-w-[95vw] max-h-[75vh]">
+                    <img id="level-image" src="" alt="Level Background" class="max-w-[95vw] max-h-[72vh] object-contain rounded-xl shadow-2xl border border-slate-800" draggable="false" />
+                    <!-- Ducks layer perfectly mapped over the image boundaries -->
                     <div id="ducks-layer" class="absolute pointer-events-auto"></div>
-                    <div id="radar-signal" class="absolute hidden pointer-events-none -translate-x-1/2 -translate-y-1/2 w-16 h-16">
+                    <div id="radar-signal" class="absolute hidden pointer-events-none -translate-x-1/2 -translate-y-1/2 w-14 h-14">
                         <div class="w-full h-full rounded-full border-2 border-amber-400 bg-amber-400/20 radar-effect"></div>
                     </div>
                 </div>
@@ -144,46 +137,42 @@
 
     <!-- Win Modal -->
     <div id="modal-win" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl space-y-5">
-            <div class="text-6xl animate-bounce">🎉</div>
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-sm w-full p-5 text-center shadow-2xl space-y-4">
+            <div class="text-5xl animate-bounce">🎉</div>
             <div>
-                <h3 class="text-2xl font-black text-white">GOOD JOBB MYYY BEBEEEE</h3>
-                <p class="text-slate-400 text-sm mt-1">NAHANAP MO ALL DUCKIES</p>
+                <h3 class="text-xl font-black text-white">GOOD JOBB MYYY BEBEEEE</h3>
+                <p class="text-slate-400 text-xs mt-1">NAHANAP MO ALL DUCKIES</p>
             </div>
-            <div class="grid grid-cols-2 gap-3 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
+            <div class="grid grid-cols-2 gap-2 bg-slate-900/60 p-3 rounded-xl border border-slate-700">
                 <div>
-                    <span class="text-xs text-slate-400 block">Time Taken</span>
-                    <span id="win-time-stat" class="text-lg font-bold text-cyan-400 font-mono">00:00</span>
+                    <span class="text-[10px] text-slate-400 block">Time</span>
+                    <span id="win-time-stat" class="text-sm font-bold text-cyan-400 font-mono">00:00</span>
                 </div>
                 <div>
-                    <span class="text-xs text-slate-400 block">Ducks Found</span>
-                    <span id="win-ducks-stat" class="text-lg font-bold text-amber-400">0</span>
+                    <span class="text-[10px] text-slate-400 block">Found</span>
+                    <span id="win-ducks-stat" class="text-sm font-bold text-amber-400">0</span>
                 </div>
             </div>
-            <div class="flex gap-3 pt-2">
-                <button id="btn-win-replay" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Wepway
-                </button>
-                <button id="btn-win-next" class="flex-1 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
-                    Nextt oneeee <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
+            <div class="flex gap-2 pt-1">
+                <button id="btn-win-replay" class="flex-1 py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl text-xs">Wepway</button>
+                <button id="btn-win-next" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs">Next one</button>
             </div>
         </div>
     </div>
 
     <script>
         const SVG_FALLBACKS = [
-            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="400" fill="%2338bdf8"/><circle cx="850" cy="100" r="50" fill="%23fde047"/><ellipse cx="200" cy="420" rx="350" ry="150" fill="%234ade80"/><ellipse cx="750" cy="420" rx="400" ry="180" fill="%2315803d"/><rect y="380" width="1000" height="270" fill="%2322c55e"/><ellipse cx="500" cy="520" rx="320" ry="100" fill="%230284c7"/></svg>',
-            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="450" fill="%23fb923c"/><circle cx="500" cy="350" r="180" fill="%23facc15"/><rect y="420" width="1000" height="230" fill="%230284c7"/><path d="M0 450 Q 250 400, 500 450 T 1000 450 L 1000 650 L 0 650 Z" fill="%230369a1"/></svg>',
-            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="650" fill="%23065f46"/><path d="M 0 300 L 200 150 L 400 300 L 600 100 L 800 280 L 1000 200 L 1000 650 L 0 650 Z" fill="%23047857"/><ellipse cx="300" cy="500" rx="250" ry="80" fill="%230ea5e9"/></svg>',
-            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650"><rect width="1000" height="650" fill="%231e1b4b"/><circle cx="200" cy="150" r="40" fill="%23fef08a"/><rect y="500" width="1000" height="150" fill="%23312e81"/></svg>'
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"><rect width="800" height="300" fill="%2338bdf8"/><circle cx="700" cy="80" r="40" fill="%23fde047"/><ellipse cx="150" cy="320" rx="250" ry="120" fill="%234ade80"/><ellipse cx="650" cy="320" rx="300" ry="140" fill="%2315803d"/><rect y="280" width="800" height="220" fill="%2322c55e"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"><rect width="800" height="350" fill="%23fb923c"/><circle cx="400" cy="250" r="140" fill="%23facc15"/><rect y="320" width="800" height="180" fill="%230284c7"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"><rect width="800" height="500" fill="%23065f46"/><path d="M 0 250 L 150 120 L 350 250 L 550 80 L 750 220 L 800 200 L 800 500 L 0 500 Z" fill="%23047857"/></svg>',
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500"><rect width="800" height="500" fill="%231e1b4b"/><circle cx="150" cy="120" r="30" fill="%23fef08a"/><rect y="380" width="800" height="120" fill="%23312e81"/></svg>'
         ];
 
         const UNSPLASH_FALLBACKS = [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
-            'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80',
-            'https://images.unsplash.com/photo-1511497584788-876761c11969?auto=format&fit=crop&w=1200&q=80',
-            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80'
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80',
+            'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1000&q=80',
+            'https://images.unsplash.com/photo-1511497584788-876761c11969?auto=format&fit=crop&w=1000&q=80',
+            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1000&q=80'
         ];
 
         const LEVELS_CONFIG = [
@@ -199,20 +188,12 @@
         let hintsRemaining = 3;
         let timerInterval = null;
         let secondsElapsed = 0;
-        
-        let bgmMuted = false;
         let sfxMuted = false;
-        let audioContext = null;
-        let synthBgmInterval = null;
 
         const DOM = {
-            bgmAudio: document.getElementById('bgm-audio'),
             sfxQuack: document.getElementById('sfx-quack'),
-            btnToggleBgm: document.getElementById('btn-toggle-bgm'),
             btnToggleSfx: document.getElementById('btn-toggle-sfx'),
-            iconBgm: document.getElementById('icon-bgm'),
             iconSfx: document.getElementById('icon-sfx'),
-            audioControls: document.getElementById('audio-controls'),
             viewHome: document.getElementById('view-home'),
             viewLevelSelect: document.getElementById('view-level-select'),
             viewGameplay: document.getElementById('view-gameplay'),
@@ -242,14 +223,10 @@
 
         function setupEventListeners() {
             DOM.btnPlayNow.addEventListener('click', () => {
-                initAudioContext();
-                startBGM();
                 DOM.viewHome.classList.add('hidden');
-                DOM.audioControls.classList.remove('hidden');
                 startLevel(LEVELS_CONFIG[0].id);
             });
 
-            DOM.btnToggleBgm.addEventListener('click', toggleBGM);
             DOM.btnToggleSfx.addEventListener('click', toggleSFX);
             DOM.btnBackMenu.addEventListener('click', showLevelSelect);
             DOM.btnHint.addEventListener('click', triggerHint);
@@ -268,47 +245,6 @@
             window.addEventListener('resize', fitDucksToImage);
         }
 
-        function initAudioContext() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-        }
-
-        function startBGM() {
-            if (bgmMuted) return;
-            DOM.bgmAudio.volume = 0.5;
-            DOM.bgmAudio.play().catch(err => {
-                console.warn("MP3 BGM blocked, starting Synth BGM:", err);
-                startSynthBGM();
-            });
-        }
-
-        // Upbeat synthesized duck song melody fallback
-        function startSynthBGM() {
-            if (synthBgmInterval) clearInterval(synthBgmInterval);
-            const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
-            let i = 0;
-            synthBgmInterval = setInterval(() => {
-                if (bgmMuted || !audioContext) return;
-                try {
-                    const osc = audioContext.createOscillator();
-                    const gain = audioContext.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(notes[i % notes.length], audioContext.currentTime);
-                    gain.gain.setValueAtTime(0.08, audioContext.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.25);
-                    osc.connect(gain);
-                    gain.connect(audioContext.destination);
-                    osc.start();
-                    osc.stop(audioContext.currentTime + 0.25);
-                    i++;
-                } catch(e) {}
-            }, 300);
-        }
-
         function renderLevelGrid() {
             DOM.levelGrid.innerHTML = '';
             LEVELS_CONFIG.forEach((level, index) => {
@@ -316,26 +252,26 @@
                 const isCompleted = localStorage.getItem(`spot_duck_completed_${level.id}`) === 'true';
 
                 const card = document.createElement('div');
-                card.className = 'bg-slate-800/80 border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl hover:border-amber-400/50 transition duration-300 flex flex-col group cursor-pointer';
+                card.className = 'bg-slate-800/80 border border-slate-700/80 rounded-xl overflow-hidden shadow-md hover:border-amber-400 transition flex flex-col group cursor-pointer';
                 
                 card.innerHTML = `
-                    <div class="relative h-36 bg-slate-900 overflow-hidden">
+                    <div class="relative h-28 bg-slate-900 overflow-hidden">
                         <img src="${level.image}" alt="${level.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
                              onerror="this.onerror=null; this.src='${level.unsplash}';">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
                         ${isCompleted ? `
-                            <div class="absolute top-3 right-3 bg-emerald-500 text-slate-950 font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow">
-                                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Cleared
+                            <div class="absolute top-2 right-2 bg-emerald-500 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow">
+                                <i data-lucide="check-circle" class="w-3 h-3"></i> Cleared
                             </div>
                         ` : ''}
-                        <div class="absolute bottom-3 left-3 right-3">
-                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Level ${index + 1}</span>
-                            <h3 class="text-base font-extrabold text-white">${level.title}</h3>
+                        <div class="absolute bottom-2 left-2 right-2">
+                            <span class="text-[10px] font-bold text-amber-400 uppercase">Level ${index + 1}</span>
+                            <h3 class="text-sm font-extrabold text-white">${level.title}</h3>
                         </div>
                     </div>
-                    <div class="p-3 bg-slate-800 flex justify-between items-center text-xs text-slate-400">
+                    <div class="p-2.5 bg-slate-800 flex justify-between items-center text-xs text-slate-400">
                         <span>Best: <strong class="text-slate-200 font-mono">${bestTime ? formatTime(parseInt(bestTime)) : '--:--'}</strong></span>
-                        <button class="px-4 py-1.5 bg-amber-500 group-hover:bg-amber-400 text-slate-950 font-black rounded-xl transition">PLAY</button>
+                        <button class="px-3 py-1 bg-amber-500 text-slate-950 font-black rounded-lg transition">PLAY</button>
                     </div>
                 `;
 
@@ -349,15 +285,15 @@
             currentLevel = LEVELS_CONFIG.find(l => l.id === levelId);
             if (!currentLevel) return;
 
-            const count = Math.floor(Math.random() * 4) + 5; // 5 to 8 ducks
+            const count = Math.floor(Math.random() * 3) + 5; // 5 to 7 ducks
             generatedDucks = [];
 
-            // Strict bounds: 15% to 85% to stay completely inside the image box
+            // Safe boundary restriction: 20% to 80% ensures ducks stay 100% inside the image box
             for (let i = 0; i < count; i++) {
                 generatedDucks.push({
-                    x: Math.floor(Math.random() * 70) + 15,
-                    y: Math.floor(Math.random() * 70) + 15,
-                    size: Math.floor(Math.random() * 6) + 26
+                    x: Math.floor(Math.random() * 60) + 20,
+                    y: Math.floor(Math.random() * 60) + 20,
+                    size: Math.floor(Math.random() * 4) + 22
                 });
             }
 
@@ -393,7 +329,6 @@
             startTimer();
         }
 
-        // Fits the ducks layer precisely onto the rendered image box on the screen
         function fitDucksToImage() {
             setTimeout(() => {
                 const rect = DOM.levelImage.getBoundingClientRect();
@@ -454,9 +389,9 @@
             element.classList.add('duck-found-anim');
             element.innerHTML = `
                 <div class="relative w-full h-full flex items-center justify-center">
-                    <span class="text-2xl drop-shadow-lg">🦆</span>
-                    <div class="absolute -top-2 -right-2 bg-emerald-500 text-slate-950 rounded-full p-0.5 shadow">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    <span class="text-xl drop-shadow-lg">🦆</span>
+                    <div class="absolute -top-1.5 -right-1.5 bg-emerald-500 text-slate-950 rounded-full p-0.5 shadow">
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                 </div>
             `;
@@ -470,36 +405,7 @@
         function playQuackSFX() {
             if (sfxMuted) return;
             DOM.sfxQuack.currentTime = 0;
-            DOM.sfxQuack.play().catch(() => playSyntheticQuack());
-        }
-
-        function playSyntheticQuack() {
-            try {
-                initAudioContext();
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(450, audioContext.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(180, audioContext.currentTime + 0.18);
-                gain.gain.setValueAtTime(0.4, audioContext.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.18);
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-                osc.start();
-                osc.stop(audioContext.currentTime + 0.18);
-            } catch (e) {}
-        }
-
-        function toggleBGM() {
-            bgmMuted = !bgmMuted;
-            if (bgmMuted) {
-                DOM.bgmAudio.pause();
-                if (synthBgmInterval) clearInterval(synthBgmInterval);
-                DOM.btnToggleBgm.classList.add('opacity-50');
-            } else {
-                DOM.bgmAudio.play().catch(() => startSynthBGM());
-                DOM.btnToggleBgm.classList.remove('opacity-50');
-            }
+            DOM.sfxQuack.play().catch(() => {});
         }
 
         function toggleSFX() {
@@ -521,7 +427,7 @@
             DOM.hintCount.textContent = hintsRemaining;
             if (hintsRemaining <= 0) DOM.btnHint.disabled = true;
 
-            setTimeout(() => DOM.radarSignal.classList.add('hidden'), 3500);
+            setTimeout(() => DOM.radarSignal.classList.add('hidden'), 3000);
         }
 
         function handleWin() {
@@ -530,7 +436,7 @@
             DOM.winTimeStat.textContent = formatTime(secondsElapsed);
             DOM.winDucksStat.textContent = generatedDucks.length.toString();
             DOM.modalWin.classList.remove('hidden');
-            if (typeof confetti === 'function') confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+            if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         }
 
         function startTimer() {
