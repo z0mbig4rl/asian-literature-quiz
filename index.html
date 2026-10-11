@@ -33,6 +33,7 @@
 
         .game-canvas-container {
             cursor: grab;
+            touch-action: none;
         }
         .game-canvas-container:active {
             cursor: grabbing;
@@ -152,8 +153,8 @@
             </div>
 
             <div id="viewport-container" class="w-full h-full relative overflow-hidden flex items-center justify-center game-canvas-container">
-                <div id="game-board" class="relative origin-center transition-transform duration-75 ease-out select-none" style="transform: translate(0px, 0px) scale(1);">
-                    <img id="level-image" src="" alt="Level Background" class="max-w-none pointer-events-none rounded-sm shadow-2xl block border border-slate-800" draggable="false" />
+                <div id="game-board" class="relative origin-center transition-transform duration-75 ease-out select-none flex items-center justify-center" style="transform: translate(0px, 0px) scale(1);">
+                    <img id="level-image" src="" alt="Level Background" class="max-w-[95vw] max-h-[85vh] object-contain pointer-events-none rounded-lg shadow-2xl block border border-slate-800" draggable="false" />
                     <div id="ducks-layer" class="absolute inset-0 pointer-events-auto"></div>
                     <div id="radar-signal" class="absolute hidden pointer-events-none -translate-x-1/2 -translate-y-1/2 w-20 h-20">
                         <div class="w-full h-full rounded-full border-2 border-amber-400 bg-amber-400/20 radar-effect"></div>
@@ -208,7 +209,6 @@
             'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80'
         ];
 
-        // Configured for 4 levels from background/ folder
         const LEVELS_CONFIG = [
             { id: "level1", title: "Level 1", image: "background/level1.jpg", fallbackImage: "background/level1.png", unsplash: UNSPLASH_FALLBACKS[0], svg: SVG_FALLBACKS[0] },
             { id: "level2", title: "Level 2", image: "background/level2.jpg", fallbackImage: "background/level2.png", unsplash: UNSPLASH_FALLBACKS[1], svg: SVG_FALLBACKS[1] },
@@ -362,11 +362,12 @@
             const count = Math.floor(Math.random() * 6) + 5; 
             generatedDucks = [];
 
+            // Constrain duck spawning safely within 15% to 85% so they stay inside mobile viewports
             for (let i = 0; i < count; i++) {
                 generatedDucks.push({
-                    x: Math.floor(Math.random() * 80) + 10,
-                    y: Math.floor(Math.random() * 75) + 12,
-                    size: Math.floor(Math.random() * 8) + 26
+                    x: Math.floor(Math.random() * 70) + 15,
+                    y: Math.floor(Math.random() * 66) + 17,
+                    size: Math.floor(Math.random() * 6) + 24
                 });
             }
 
@@ -543,6 +544,24 @@
             });
 
             window.addEventListener('mouseup', () => isDragging = false);
+
+            // Touch support for mobile dragging
+            container.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1 && !e.target.closest('#ducks-layer > div')) {
+                    isDragging = true;
+                    dragStartX = e.touches[0].clientX - panX;
+                    dragStartY = e.touches[0].clientY - panY;
+                }
+            });
+
+            window.addEventListener('touchmove', (e) => {
+                if (!isDragging || e.touches.length !== 1) return;
+                panX = e.touches[0].clientX - dragStartX;
+                panY = e.touches[0].clientY - dragStartY;
+                updateTransform();
+            });
+
+            window.addEventListener('touchend', () => isDragging = false);
 
             container.addEventListener('wheel', (e) => {
                 e.preventDefault();
