@@ -28,7 +28,6 @@
             overflow-x: hidden;
         }
 
-        /* Lock scrolling during active gameplay */
         body.game-active {
             overflow: hidden;
         }
@@ -84,16 +83,26 @@
             </div>
         </div>
 
-        <div>
-            <!-- Volume button controls YouTube Music Mute/Unmute -->
-            <button id="btn-toggle-music" title="Toggle YouTube Music" class="p-1.5 rounded-lg bg-slate-700 text-amber-400 hover:bg-slate-600 transition flex items-center gap-1 px-2 text-xs font-bold">
+        <!-- In-Game Music & Volume Controls -->
+        <div class="flex items-center gap-1.5">
+            <button id="btn-game-play" title="Play Music" class="p-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition hidden">
+                <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+            </button>
+            <button id="btn-game-pause" title="Pause Music" class="p-1.5 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition hidden">
+                <i data-lucide="pause" class="w-4 h-4 fill-current"></i>
+            </button>
+            <button id="btn-toggle-music" title="Toggle YouTube Music Mute" class="p-1.5 rounded-lg bg-slate-700 text-amber-400 hover:bg-slate-600 transition flex items-center gap-1 px-2 text-xs font-bold">
                 <i id="icon-music" data-lucide="volume-2" class="w-4 h-4"></i>
-                <span class="hidden sm:inline">Music</span>
             </button>
         </div>
     </header>
 
     <main class="flex-1 relative bg-slate-950 flex flex-col items-center justify-center p-2 min-h-[calc(100vh-50px)]">
+
+        <!-- Hidden YouTube Player Container (Loads API without hiding audio) -->
+        <div class="hidden">
+            <div id="youtube-player"></div>
+        </div>
 
         <!-- Home Screen -->
         <div id="view-home" class="absolute inset-0 z-30 bg-slate-950 flex flex-col items-center justify-center p-4 text-center">
@@ -104,19 +113,15 @@
                     <p class="text-slate-400 text-xs">Hanap hanappp ikaww duckiess hereee</p>
                 </div>
 
-                <!-- YouTube Video Container with Manual Controls -->
-                <div class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 shadow-lg space-y-2">
-                    <p class="text-[11px] text-amber-400 font-bold">🎵 The Duck Song</p>
-                    <div class="relative w-full overflow-hidden rounded-lg aspect-video">
-                        <div id="youtube-player"></div>
-                    </div>
-                    <!-- Play / Pause Buttons -->
+                <!-- YouTube Controls on Home -->
+                <div class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 shadow-lg space-y-2">
+                    <p class="text-xs text-amber-400 font-bold">🎵 The Duck Song</p>
                     <div class="flex gap-2">
-                        <button id="btn-yt-play" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1 transition">
-                            <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Play Song
+                        <button id="btn-yt-play" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1 transition">
+                            <i data-lucide="play" class="w-4 h-4 fill-current"></i> Play Song
                         </button>
-                        <button id="btn-yt-pause" class="flex-1 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1 transition">
-                            <i data-lucide="pause" class="w-3.5 h-3.5 fill-current"></i> Pause Song
+                        <button id="btn-yt-pause" class="flex-1 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1 transition">
+                            <i data-lucide="pause" class="w-4 h-4 fill-current"></i> Pause Song
                         </button>
                     </div>
                 </div>
@@ -187,8 +192,8 @@
 
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('youtube-player', {
-                height: '100%',
-                width: '100%',
+                height: '0',
+                width: '0',
                 videoId: '9Ws0Sq-96dY',
                 playerVars: { 'playsinline': 1, 'autoplay': 0 }
             });
@@ -233,6 +238,8 @@
             ],
             btnYtPlay: document.getElementById('btn-yt-play'),
             btnYtPause: document.getElementById('btn-yt-pause'),
+            btnGamePlay: document.getElementById('btn-game-play'),
+            btnGamePause: document.getElementById('btn-game-pause'),
             btnToggleMusic: document.getElementById('btn-toggle-music'),
             iconMusic: document.getElementById('icon-music'),
             viewHome: document.getElementById('view-home'),
@@ -263,19 +270,19 @@
         });
 
         function setupEventListeners() {
-            DOM.btnYtPlay.addEventListener('click', () => {
-                if (ytPlayer && typeof ytPlayer.playVideo === 'function') ytPlayer.playVideo();
-            });
-            DOM.btnYtPause.addEventListener('click', () => {
-                if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
-            });
+            const playMusic = () => { if (ytPlayer && typeof ytPlayer.playVideo === 'function') ytPlayer.playVideo(); };
+            const pauseMusic = () => { if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo(); };
+
+            DOM.btnYtPlay.addEventListener('click', playMusic);
+            DOM.btnYtPause.addEventListener('click', pauseMusic);
+            DOM.btnGamePlay.addEventListener('click', playMusic);
+            DOM.btnGamePause.addEventListener('click', pauseMusic);
 
             DOM.btnPlayNow.addEventListener('click', () => {
-                if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-                    ytPlayer.pauseVideo();
-                }
-                document.body.classList.add('game-active');
                 DOM.viewHome.classList.add('hidden');
+                document.body.classList.add('game-active');
+                DOM.btnGamePlay.classList.remove('hidden');
+                DOM.btnGamePause.classList.remove('hidden');
                 startLevel(LEVELS_CONFIG[0].id);
             });
 
@@ -408,6 +415,8 @@
         function showLevelSelect() {
             stopTimer();
             document.body.classList.remove('game-active');
+            DOM.btnGamePlay.classList.add('hidden');
+            DOM.btnGamePause.classList.add('hidden');
             DOM.viewGameplay.classList.add('hidden');
             DOM.viewLevelSelect.classList.remove('hidden');
             DOM.btnBackMenu.classList.add('hidden');
@@ -470,10 +479,10 @@
             }
         }
 
-        // 20% Chance Easter Duck Logic with Audio Interruption
+        // 50% Chance Easter Duck Logic with Audio Interruption
         function playDuckSoundWithMusicInterruption() {
             let soundToPlay;
-            let isEaster = Math.random() < 0.20; 
+            let isEaster = Math.random() < 0.50; // 50% chance
 
             if (isEaster) {
                 const randomEaster = DOM.easterAudios[Math.floor(Math.random() * DOM.easterAudios.length)];
