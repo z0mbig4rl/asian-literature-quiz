@@ -154,7 +154,8 @@
 
             <div id="viewport-container" class="w-full h-full relative overflow-hidden flex items-center justify-center game-canvas-container">
                 <div id="game-board" class="relative origin-center transition-transform duration-75 ease-out select-none flex items-center justify-center" style="transform: translate(0px, 0px) scale(1);">
-                    <img id="level-image" src="" alt="Level Background" class="max-w-[95vw] max-h-[85vh] object-contain pointer-events-none rounded-lg shadow-2xl block border border-slate-800" draggable="false" />
+                    <img id="level-image" src="" alt="Level Background" class="max-w-[90vw] max-h-[80vh] object-contain pointer-events-none rounded-lg shadow-2xl block border border-slate-800" draggable="false" />
+                    <!-- Ducks layer is bound precisely over the image container -->
                     <div id="ducks-layer" class="absolute inset-0 pointer-events-auto"></div>
                     <div id="radar-signal" class="absolute hidden pointer-events-none -translate-x-1/2 -translate-y-1/2 w-20 h-20">
                         <div class="w-full h-full rounded-full border-2 border-amber-400 bg-amber-400/20 radar-effect"></div>
@@ -308,12 +309,43 @@
             });
         }
 
+        // BGM Play Handler with Web Audio Synth Fallback
         function startBGM() {
             if (!bgmMuted) {
                 DOM.bgmAudio.volume = parseFloat(DOM.bgmVolume.value);
                 DOM.bgmAudio.play().catch(err => {
-                    console.warn("Background music play prevented by browser policy:", err);
+                    console.warn("BGM file blocked or missing, using upbeat synthesizer stream instead:", err);
+                    playSynthesizedBGM();
                 });
+            }
+        }
+
+        // Web Audio Synthesizer Loop (Guarantees music plays even if the MP3 file fails)
+        let synthBgmInterval = null;
+        function playSynthesizedBGM() {
+            try {
+                if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (synthBgmInterval) clearInterval(synthBgmInterval);
+                
+                const notes = [261.63, 329.63, 392.00, 523.25]; // C major upbeat arpeggio
+                let step = 0;
+                
+                synthBgmInterval = setInterval(() => {
+                    if (bgmMuted) return;
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(notes[step % notes.length], audioContext.currentTime);
+                    gain.gain.setValueAtTime(0.08, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.start();
+                    osc.stop(audioContext.currentTime + 0.3);
+                    step++;
+                }, 350);
+            } catch (e) {
+                console.warn("Synth BGM error:", e);
             }
         }
 
@@ -362,11 +394,11 @@
             const count = Math.floor(Math.random() * 6) + 5; 
             generatedDucks = [];
 
-            // Constrain duck spawning safely within 15% to 85% so they stay inside mobile viewports
+            // Safe boundary restriction: 12% to 88% ensures ducks are 100% inside the image box
             for (let i = 0; i < count; i++) {
                 generatedDucks.push({
-                    x: Math.floor(Math.random() * 70) + 15,
-                    y: Math.floor(Math.random() * 66) + 17,
+                    x: Math.floor(Math.random() * 76) + 12,
+                    y: Math.floor(Math.random() * 72) + 14,
                     size: Math.floor(Math.random() * 6) + 24
                 });
             }
@@ -395,9 +427,22 @@
                 }
             };
 
+            // Re-sync duck layer positioning once image dimensions render
+            DOM.levelImage.onload = () => {
+                updateDucksLayerSize();
+            };
+
             renderDucks();
             startTimer();
             resetZoomAndPan();
+        }
+
+        // Matches the interactive duck layer size precisely to the loaded image bounding box
+        function updateDucksLayerSize() {
+            const imgRect = DOM.levelImage.getBoundingClientRect();
+            const boardRect = DOM.gameBoard.getBoundingClientRect();
+            DOM.ducksLayer.style.width = `${DOM.levelImage.clientWidth}px`;
+            DOM.ducksLayer.style.height = `${DOM.levelImage.clientHeight}px`;
         }
 
         function showLevelSelect() {
@@ -411,6 +456,8 @@
 
         function renderDucks() {
             DOM.ducksLayer.innerHTML = '';
+            setTimeout(updateDucksLayerSize, 50);
+
             generatedDucks.forEach((duck, index) => {
                 const duckEl = document.createElement('div');
                 duckEl.className = 'absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform duration-200 hover:scale-125';
@@ -488,9 +535,10 @@
             bgmMuted = !bgmMuted;
             if (bgmMuted) {
                 DOM.bgmAudio.pause();
+                if (synthBgmInterval) clearInterval(synthBgmInterval);
                 DOM.btnToggleBgm.classList.add('opacity-50');
             } else {
-                DOM.bgmAudio.play().catch(() => {});
+                DOM.bgmAudio.play().catch(() => playSynthesizedBGM());
                 DOM.btnToggleBgm.classList.remove('opacity-50');
             }
         }
@@ -545,7 +593,6 @@
 
             window.addEventListener('mouseup', () => isDragging = false);
 
-            // Touch support for mobile dragging
             container.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 1 && !e.target.closest('#ducks-layer > div')) {
                     isDragging = true;
@@ -604,6 +651,8 @@
             const secs = (totalSecs % 60).toString().padStart(2, '0');
             return `${mins}:${secs}`;
         }
+
+        window.addEventListener('resize', updateDucksLayerSize);
     </script>
 </body>
 </html>
